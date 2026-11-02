@@ -1,0 +1,326 @@
+<div class="resume-page">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">STUDENT CAREER TOOLS</span>
+      <h1>AI Resume Builder</h1>
+      <p>Create a professional resume and improve your profile.</p>
+    </div>
+
+    <button class="download-btn" (click)="downloadResume()">
+      Download PDF
+    </button>
+  </header>
+
+  <div class="resume-layout">
+    <!-- LEFT: RESUME EDITOR -->
+
+    <section class="editor-panel">
+      <div class="section-card">
+        <h2>01. Personal Information</h2>
+
+        <div class="form-grid">
+          <label>
+            Full Name
+            <input
+              [(ngModel)]="personal.fullName"
+              placeholder="Enter your full name"
+            />
+          </label>
+
+          <label>
+            Email
+            <input
+              type="email"
+              [(ngModel)]="personal.email"
+              placeholder="your@email.com"
+            />
+          </label>
+
+          <label>
+            Phone
+            <input [(ngModel)]="personal.phone" placeholder="+91 9876543210" />
+          </label>
+
+          <label>
+            Location
+            <input
+              [(ngModel)]="personal.location"
+              placeholder="Pune, Maharashtra"
+            />
+          </label>
+
+          <label>
+            LinkedIn
+            <input
+              [(ngModel)]="personal.linkedin"
+              placeholder="LinkedIn profile URL"
+            />
+          </label>
+
+          <label>
+            GitHub / Portfolio
+            <input
+              [(ngModel)]="personal.github"
+              placeholder="GitHub or portfolio URL"
+            />
+          </label>
+        </div>
+
+        <label>
+          Professional Summary
+          <textarea
+            rows="4"
+            [(ngModel)]="personal.summary"
+            placeholder="Write a short professional introduction..."
+          ></textarea>
+        </label>
+      </div>
+
+      <div class="section-card">
+        <div class="section-heading">
+          <h2>02. Education</h2>
+          <button class="add-btn" (click)="addEducation()">+ Add</button>
+        </div>
+
+        <div class="repeat-card" *ngFor="let item of educations; let i = index">
+          <button
+            class="remove-btn"
+            *ngIf="educations.length > 1"
+            (click)="removeEducation(i)"
+          >
+            Remove
+          </button>
+
+          <label
+            >Degree
+            <input [(ngModel)]="item.degree" placeholder="BCA / B.Tech / MCA" />
+          </label>
+
+          <label
+            >Institution
+            <input
+              [(ngModel)]="item.institution"
+              placeholder="College or university"
+            />
+          </label>
+
+          <div class="form-grid">
+            <label
+              >Year
+              <input [(ngModel)]="item.year" placeholder="2022 - 2025" />
+            </label>
+
+            <label
+              >CGPA / Percentage
+              <input [(ngModel)]="item.percentage" placeholder="6.5 CGPA" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2>03. Technical Skills</h2>
+        <label>
+          Skills (separate with commas)
+          <textarea
+            rows="3"
+            [(ngModel)]="skillsText"
+            placeholder="Python, Django, FastAPI, SQL, Angular, Git"
+          ></textarea>
+        </label>
+      </div>
+
+      <div class="section-card">
+        <div class="section-heading">
+          <h2>04. Projects</h2>
+          <button class="add-btn" (click)="addProject()">+ Add</button>
+        </div>
+
+        <div class="repeat-card" *ngFor="let item of projects; let i = index">
+          <button
+            class="remove-btn"
+            *ngIf="projects.length > 1"
+            (click)="removeProject(i)"
+          >
+            Remove
+          </button>
+
+          <label
+            >Project Name
+            <input [(ngModel)]="item.title" placeholder="Project title" />
+          </label>
+
+          <label
+            >Description
+            <textarea
+              rows="3"
+              [(ngModel)]="item.description"
+              placeholder="Describe your project and contributions"
+            ></textarea>
+          </label>
+
+          <label
+            >Technologies
+            <input
+              [(ngModel)]="item.technologies"
+              placeholder="Python, FastAPI, Angular"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-heading">
+          <h2>05. Experience / Internship</h2>
+          <button class="add-btn" (click)="addExperience()">+ Add</button>
+        </div>
+
+        <div
+          class="repeat-card"
+          *ngFor="let item of experiences; let i = index"
+        >
+          <button
+            class="remove-btn"
+            *ngIf="experiences.length > 1"
+            (click)="removeExperience(i)"
+          >
+            Remove
+          </button>
+
+          <label
+            >Job Role
+            <input
+              [(ngModel)]="item.role"
+              placeholder="Python Developer Intern"
+            />
+          </label>
+
+          <label
+            >Company
+            <input [(ngModel)]="item.company" placeholder="Company name" />
+          </label>
+
+          <label
+            >Duration
+            <input
+              [(ngModel)]="item.duration"
+              placeholder="Aug 2026 - Present"
+            />
+          </label>
+
+          <label
+            >Description
+            <textarea
+              rows="3"
+              [(ngModel)]="item.description"
+              placeholder="Describe your responsibilities"
+            ></textarea>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: LIVE PREVIEW -->
+
+    <aside class="preview-panel">
+      <div class="preview-heading">
+        <div>
+          <h2>Live Preview</h2>
+          <p>Your resume updates as you type.</p>
+        </div>
+        <span class="live-dot">LIVE</span>
+      </div>
+
+      <article class="resume-paper" id="resume-paper">
+        <div class="resume-name">
+          <h1>{{ personal.fullName || "Your Name" }}</h1>
+          <p>
+            {{ personal.email || "Email" }}
+            <span *ngIf="personal.phone"> | {{ personal.phone }}</span>
+          </p>
+          <p>
+            {{ personal.location }}
+          </p>
+          <p>
+            {{ personal.linkedin }}
+            <span *ngIf="personal.github"> | {{ personal.github }}</span>
+          </p>
+        </div>
+
+        <section>
+          <h3>PROFESSIONAL SUMMARY</h3>
+          <p>
+            {{
+              personal.summary || "Your professional summary will appear here."
+            }}
+          </p>
+        </section>
+
+        <section>
+          <h3>EDUCATION</h3>
+          <div *ngFor="let item of educations">
+            <strong>{{ item.degree }}</strong>
+            <p>{{ item.institution }}</p>
+            <p>{{ item.year }} {{ item.percentage }}</p>
+          </div>
+        </section>
+
+        <section>
+          <h3>TECHNICAL SKILLS</h3>
+          <p>{{ skills.join(" • ") || "Your technical skills" }}</p>
+        </section>
+
+        <section>
+          <h3>PROJECTS</h3>
+          <div *ngFor="let item of projects">
+            <strong>{{ item.title }}</strong>
+            <p>{{ item.description }}</p>
+            <small>{{ item.technologies }}</small>
+          </div>
+        </section>
+
+        <section>
+          <h3>EXPERIENCE</h3>
+          <div *ngFor="let item of experiences">
+            <strong>{{ item.role }}</strong>
+            <p>{{ item.company }} | {{ item.duration }}</p>
+            <p>{{ item.description }}</p>
+          </div>
+        </section>
+      </article>
+
+      <!-- EXISTING AI ANALYSIS ENDPOINT -->
+
+      <div class="ai-card">
+        <h2>AI Resume Analysis</h2>
+        <p>
+          Upload an existing PDF or DOCX resume to receive feedback from your
+          backend AI service.
+        </p>
+
+        <input
+          type="file"
+          accept=".pdf,.docx"
+          (change)="onFileSelected($event)"
+        />
+
+        <p class="error-message" *ngIf="analysisError">
+          {{ analysisError }}
+        </p>
+
+        <button
+          class="ai-btn"
+          [disabled]="!resumeFile || analyzing"
+          (click)="analyzeResume()"
+        >
+          {{ analyzing ? "Analyzing..." : "Analyze with AI" }}
+        </button>
+
+        <div class="analysis-result" *ngIf="analysisResult">
+          <h3>AI Analysis Result</h3>
+          <pre>{{ analysisResult | json }}</pre>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="users-table-wrapper">
+  <div class="users-table-heading">
+    <div>
+      <h2>Platform Users</h2>
+      <p>Manage user accounts and view their database IDs.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadUsers()"
+      [disabled]="loading"
+    >
+      {{ loading ? "Loading..." : "Refresh users" }}
+    </button>
+  </div>
+
+  <p *ngIf="loading" class="table-message" aria-live="polite">
+    Loading users...
+  </p>
+
+  <p *ngIf="!loading && errorMessage" class="table-message error-message">
+    {{ errorMessage }}
+  </p>
+
+  <table class="users-table" *ngIf="users.length > 0">
+    <thead>
+      <td>
+        <span class="user-id-badge">
+          #{{
+            user.id ??
+              user.user_id ??
+              user.ID ??
+              user.pk ??
+              user.userId ??
+              "N/A"
+          }}
+        </span>
+      </td>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let user of users; trackBy: trackByUserId">
+        <td>
+          <span class="user-id-badge"> #{{ getUserId(user) }} </span>
+        </td>
+
+        <td class="user-name-cell">
+          {{ getUserName(user) }}
+        </td>
+
+        <td>{{ user.email || "N/A" }}</td>
+
+        <td>
+          <span class="role-badge">
+            {{ user.role || "N/A" }}
+          </span>
+        </td>
+
+        <td>
+          <span
+            class="status-badge"
+            [class.active]="getUserStatus(user) === 'Active'"
+            [class.inactive]="getUserStatus(user) === 'Inactive'"
+          >
+            {{ getUserStatus(user) }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

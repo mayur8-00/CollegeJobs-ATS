@@ -1,0 +1,540 @@
+<div class="jobs-page" [class.dark-mode]="isDarkMode">
+  <!-- Header -->
+  <header class="jobs-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <i class="fas fa-briefcase"></i>
+        </div>
+
+        <div>
+          <h1>Explore Jobs</h1>
+          <p>Find opportunities and build your career</p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="theme-button"
+        (click)="toggleTheme()"
+        [attr.aria-label]="
+          isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+        "
+      >
+        <i [class]="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="jobs-container">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div>
+        <span class="eyebrow">CAREER OPPORTUNITIES</span>
+        <h2>Find your next opportunity.</h2>
+        <p>
+          Explore available jobs, discover companies and apply with your resume.
+        </p>
+      </div>
+
+      <div class="welcome-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+    </section>
+
+    <!-- Search and Filters -->
+    <section class="filter-panel">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+
+        <input
+          type="text"
+          placeholder="Search by job title, company, skills..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+
+      <div class="filter-controls">
+        <select
+          [(ngModel)]="selectedLocation"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by location"
+        >
+          <option value="">All Locations</option>
+          <option *ngFor="let location of locations" [value]="location">
+            {{ location }}
+          </option>
+        </select>
+
+        <select
+          [(ngModel)]="selectedJobType"
+          (ngModelChange)="onFilterChange()"
+          aria-label="Filter by job type"
+        >
+          <option value="">All Job Types</option>
+          <option *ngFor="let type of jobTypes" [value]="type">
+            {{ type }}
+          </option>
+        </select>
+
+        <select
+          [(ngModel)]="selectedSort"
+          (ngModelChange)="onSortChange()"
+          aria-label="Sort jobs"
+        >
+          <option value="newest">Newest First</option>
+          <option value="title">Job Title</option>
+          <option value="salary">Highest Salary</option>
+        </select>
+
+        <button type="button" class="clear-button" (click)="clearFilters()">
+          <i class="fas fa-rotate-left"></i>
+          Clear
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Heading -->
+    <section class="results-heading">
+      <div>
+        <h3>Available Jobs</h3>
+        <p>
+          Showing
+          <strong>{{ filteredJobs.length }}</strong>
+          of
+          <strong>{{ jobs.length }}</strong>
+          opportunities
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="refresh-button"
+        (click)="loadJobs()"
+        [disabled]="isLoading"
+      >
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+        Refresh
+      </button>
+    </section>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loader"></div>
+      <h3>Finding opportunities...</h3>
+      <p>Please wait while we load available jobs.</p>
+    </div>
+
+    <!-- Error -->
+    <div class="message-card error-card" *ngIf="!isLoading && errorMessage">
+      <i class="fas fa-circle-exclamation"></i>
+      <div>
+        <h3>Unable to load jobs</h3>
+        <p>{{ errorMessage }}</p>
+        <button type="button" (click)="loadJobs()">Try Again</button>
+      </div>
+    </div>
+
+    <!-- Job Cards -->
+    <section
+      class="jobs-grid"
+      *ngIf="!isLoading && !errorMessage && filteredJobs.length > 0"
+    >
+      <article
+        class="job-card"
+        *ngFor="let job of filteredJobs; trackBy: trackByJobId"
+      >
+        <div class="job-card-top">
+          <div class="company-avatar">
+            {{ getCompanyInitial(job) }}
+          </div>
+
+          <button
+            type="button"
+            class="save-button"
+            [class.saved]="isJobSaved(job.id)"
+            (click)="toggleSaveJob(job, $event)"
+            [attr.aria-label]="
+              isJobSaved(job.id) ? 'Remove saved job' : 'Save job'
+            "
+          >
+            <i
+              [class]="
+                isJobSaved(job.id) ? 'fas fa-bookmark' : 'far fa-bookmark'
+              "
+            ></i>
+          </button>
+        </div>
+
+        <div class="job-card-content">
+          <p class="company-name">{{ getCompanyName(job) }}</p>
+
+          <h3>{{ job.title }}</h3>
+
+          <div class="job-meta">
+            <span>
+              <i class="fas fa-location-dot"></i>
+              {{ job.location || "Location not specified" }}
+            </span>
+
+            <span>
+              <i class="fas fa-briefcase"></i>
+              {{ getJobType(job) }}
+            </span>
+
+            <span>
+              <i class="fas fa-user-clock"></i>
+              {{ getExperience(job) }}
+            </span>
+          </div>
+
+          <p class="job-description">
+            {{ job.description || "No job description provided." }}
+          </p>
+
+          <div class="skills-list" *ngIf="getSkills(job).length">
+            <span *ngFor="let skill of getSkills(job).slice(0, 4)">
+              {{ skill }}
+            </span>
+
+            <span *ngIf="getSkills(job).length > 4" class="more-skills">
+              +{{ getSkills(job).length - 4 }} more
+            </span>
+          </div>
+
+          <div class="job-card-footer">
+            <div class="salary">
+              <i class="fas fa-wallet"></i>
+              {{ getSalary(job) }}
+            </div>
+
+            <span class="posted-date" *ngIf="job.created_at">
+              {{ job.created_at | date: "dd MMM yyyy" }}
+            </span>
+          </div>
+        </div>
+
+        <div class="job-actions">
+          <button
+            type="button"
+            class="details-button"
+            (click)="openJobDetails(job)"
+          >
+            View Details
+          </button>
+
+          <button
+            type="button"
+            class="apply-button"
+            (click)="openApplyModal(job)"
+          >
+            Apply Now
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <!-- Empty State -->
+    <section
+      class="empty-state"
+      *ngIf="!isLoading && !errorMessage && filteredJobs.length === 0"
+    >
+      <div class="empty-icon">
+        <i class="fas fa-magnifying-glass"></i>
+      </div>
+
+      <h3>No jobs found</h3>
+
+      <p>
+        We couldn't find any jobs matching your search or filters. Try changing
+        your search criteria.
+      </p>
+
+      <button type="button" (click)="clearFilters()">Clear Filters</button>
+    </section>
+  </main>
+
+  <!-- Job Details Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="showDetailsModal && selectedJob"
+    (click)="closeJobDetails()"
+  >
+    <div
+      class="modal-container details-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="details-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">JOB INFORMATION</span>
+          <h2 id="details-title">Job Details</h2>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeJobDetails()"
+          aria-label="Close job details"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="details-company">
+          <div class="company-avatar large-avatar">
+            {{ getCompanyInitial(selectedJob) }}
+          </div>
+
+          <div>
+            <h3>{{ selectedJob.title }}</h3>
+            <p>{{ getCompanyName(selectedJob) }}</p>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span><i class="fas fa-location-dot"></i> Location</span>
+            <strong>{{ selectedJob.location || "Not specified" }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span><i class="fas fa-briefcase"></i> Job Type</span>
+            <strong>{{ getJobType(selectedJob) }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span><i class="fas fa-user-clock"></i> Experience</span>
+            <strong>{{ getExperience(selectedJob) }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span><i class="fas fa-wallet"></i> Salary</span>
+            <strong>{{ getSalary(selectedJob) }}</strong>
+          </div>
+
+          <div class="detail-item" *ngIf="selectedJob.created_at">
+            <span><i class="fas fa-calendar"></i> Posted Date</span>
+            <strong>{{ selectedJob.created_at | date: "dd MMM yyyy" }}</strong>
+          </div>
+
+          <div class="detail-item" *ngIf="selectedJob.deadline">
+            <span><i class="fas fa-calendar-check"></i> Deadline</span>
+            <strong>{{ selectedJob.deadline | date: "dd MMM yyyy" }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Job Description</h4>
+          <p>{{ selectedJob.description || "No description provided." }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedJob.requirements">
+          <h4>Requirements</h4>
+          <p>{{ selectedJob.requirements }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedJob.responsibilities">
+          <h4>Responsibilities</h4>
+          <p>{{ selectedJob.responsibilities }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="getSkills(selectedJob).length">
+          <h4>Required Skills</h4>
+
+          <div class="skills-list detail-skills">
+            <span *ngFor="let skill of getSkills(selectedJob)">
+              {{ skill }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="details-button"
+          (click)="closeJobDetails()"
+        >
+          Close
+        </button>
+
+        <button
+          type="button"
+          class="apply-button"
+          (click)="openApplyModal(selectedJob)"
+        >
+          Apply for this Job
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="showApplyModal && applyingJob"
+    (click)="closeApplyModal()"
+  >
+    <div
+      class="modal-container apply-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="apply-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">APPLICATION</span>
+          <h2 id="apply-title">Apply for Job</h2>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeApplyModal()"
+          [disabled]="isSubmitting"
+          aria-label="Close application form"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="apply-job-info">
+          <div class="company-avatar">
+            {{ getCompanyInitial(applyingJob) }}
+          </div>
+
+          <div>
+            <h3>{{ applyingJob.title }}</h3>
+            <p>{{ getCompanyName(applyingJob) }}</p>
+          </div>
+        </div>
+
+        <div class="upload-instructions">
+          <h4>Upload your resume</h4>
+          <p>
+            Upload your latest resume in PDF or DOCX format. Maximum file size:
+            5 MB.
+          </p>
+        </div>
+
+        <label class="upload-area" for="resumeInput">
+          <i class="fas fa-cloud-arrow-up"></i>
+
+          <strong>
+            {{ selectedResume ? selectedResume.name : "Choose your resume" }}
+          </strong>
+
+          <span>
+            {{
+              selectedResume
+                ? (selectedResume.size / 1024 / 1024 | number: "1.2-2") + " MB"
+                : "PDF or DOCX · Maximum 5 MB"
+            }}
+          </span>
+
+          <input
+            id="resumeInput"
+            type="file"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            (change)="onResumeSelected($event)"
+            [disabled]="isSubmitting"
+          />
+        </label>
+
+        <div class="selected-file" *ngIf="selectedResume">
+          <i class="fas fa-file-circle-check"></i>
+          <span>{{ selectedResume.name }}</span>
+          <i class="fas fa-check-circle"></i>
+        </div>
+
+        <div class="form-error" *ngIf="resumeError">
+          <i class="fas fa-circle-exclamation"></i>
+          {{ resumeError }}
+        </div>
+
+        <div class="application-note">
+          <i class="fas fa-circle-info"></i>
+          Your resume will be submitted for this job and may be analyzed by the
+          ATS system.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="details-button"
+          (click)="closeApplyModal()"
+          [disabled]="isSubmitting"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="apply-button"
+          (click)="submitApplication()"
+          [disabled]="isSubmitting || !selectedResume"
+        >
+          <i
+            class="fas"
+            [class.fa-spinner]="isSubmitting"
+            [class.fa-spin]="isSubmitting"
+            [class.fa-paper-plane]="!isSubmitting"
+          ></i>
+
+          {{ isSubmitting ? "Submitting..." : "Submit Application" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Success Modal -->
+  <div class="modal-overlay success-overlay" *ngIf="showSuccessModal">
+    <div
+      class="modal-container success-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="success-title"
+    >
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+
+      <h2 id="success-title">Application Submitted!</h2>
+
+      <p>
+        Your application has been submitted successfully. You can now continue
+        to the coding assessment.
+      </p>
+
+      <div class="success-actions">
+        <button
+          type="button"
+          class="details-button"
+          (click)="closeSuccessModal()"
+        >
+          Back to Jobs
+        </button>
+
+        <button
+          type="button"
+          class="apply-button"
+          (click)="goToAssessment()"
+          [disabled]="!appliedJobId"
+        >
+          Continue to Assessment
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

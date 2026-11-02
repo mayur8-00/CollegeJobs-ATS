@@ -1,0 +1,374 @@
+:host {
+  display: block;
+  color: #111827;
+}
+
+.details-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px clamp(18px, 3vw, 42px) 48px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 22px;
+  color: #53647f;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    gap 180ms ease;
+}
+
+.back-link:hover {
+  color: #4f46e5;
+  gap: 13px;
+}
+
+.details-hero,
+.content-card,
+.state-card {
+  border: 1px solid #e5eaf3;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 45px rgb(30 48 85 / 6%);
+}
+
+.details-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 42px);
+  animation: rise-in 450ms ease both;
+}
+
+.details-hero::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #7164ff, #a78bfa);
+  content: "";
+}
+
+.hero-topline,
+.hero-content,
+.metadata {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.hero-topline {
+  justify-content: space-between;
+}
+
+.eyebrow,
+.section-label {
+  color: #6256e8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #eafbf1;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  box-shadow: 0 0 0 4px rgb(22 163 74 / 10%);
+}
+
+.hero-content {
+  margin-top: 30px;
+}
+
+.company-mark {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  flex: 0 0 62px;
+  place-items: center;
+  border: 1px solid #e0e7ff;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eff6ff, #ede9fe);
+  color: #4338ca;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+h1 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 850;
+  letter-spacing: -1.2px;
+  line-height: 1.2;
+}
+
+.company-name {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.description {
+  max-width: 900px;
+  margin: 28px 0;
+  color: #53647f;
+  font-size: 15px;
+  line-height: 1.85;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.metadata {
+  gap: 10px;
+}
+
+.metadata span {
+  border: 1px solid #e7ebf3;
+  border-radius: 12px;
+  padding: 11px 14px;
+  background: #f8fafc;
+  color: #40516b;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.8fr);
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.content-card {
+  min-width: 0;
+  padding: clamp(22px, 3vw, 32px);
+  animation: rise-in 550ms ease both;
+}
+
+.content-card h2,
+.state-card h2 {
+  margin: 12px 0 18px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.body-copy {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.section-divider {
+  height: 1px;
+  margin: 26px 0;
+  background: #edf0f6;
+}
+
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.skill-chip {
+  border: 1px solid #dbe5f5;
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: #f4f7ff;
+  color: #344563;
+  font-size: 12px;
+  font-weight: 750;
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.skill-chip:hover {
+  transform: translateY(-2px);
+  background: #e9edff;
+}
+
+.summary-card {
+  align-self: start;
+}
+
+.summary-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf0f6;
+  font-size: 13px;
+}
+
+.summary-row span {
+  color: #748198;
+}
+
+.summary-row strong {
+  max-width: 60%;
+  color: #25324a;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.summary-note {
+  display: flex;
+  gap: 10px;
+  margin: 22px 0;
+  border-radius: 13px;
+  padding: 14px;
+  background: #f4f5ff;
+  color: #51538f;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 17px;
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 22px rgb(79 70 229 / 22%);
+}
+
+.full-width {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.state-card {
+  padding: 40px 24px;
+  text-align: center;
+  animation: rise-in 350ms ease both;
+}
+
+.state-card p {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.error-card {
+  border-color: #fee2e2;
+}
+
+.state-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff1f2;
+  color: #be123c;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.loader {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 18px;
+  border: 3px solid #e0e7ff;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 750ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 800px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .details-page {
+    padding: 20px 14px 32px;
+  }
+
+  .details-hero,
+  .content-card {
+    border-radius: 18px;
+  }
+
+  .hero-content {
+    align-items: flex-start;
+  }
+
+  .metadata {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .metadata span {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

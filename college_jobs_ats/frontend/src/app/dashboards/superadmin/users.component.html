@@ -1,0 +1,110 @@
+<div class="users-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <span class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        ACCESS CONTROL
+      </span>
+
+      <h1>User Management</h1>
+      <p>Monitor platform accounts, user identities and access permissions.</p>
+    </div>
+
+    <div class="header-count">
+      <span class="count-icon">♙</span>
+      <div>
+        <strong>{{ users.length }}</strong>
+        <small>Total Accounts</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="message error" *ngIf="error">
+    <span>!</span>
+    {{ error }}
+  </div>
+
+  <!-- User Table -->
+  <div class="card table-wrap" *ngIf="users.length; else empty">
+    <div class="table-heading">
+      <div>
+        <h2>Platform Users</h2>
+        <p>Registered accounts and their current access status.</p>
+      </div>
+
+      <span class="total-label"> {{ users.length }} Users </span>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>USER ID</th>
+            <th>NAME</th>
+            <th>EMAIL ADDRESS</th>
+            <th>ROLE</th>
+            <th>ACCOUNT STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let user of users; let i = index; trackBy: trackByUser">
+            <td>
+              <span class="user-id"> #{{ user.id ?? "—" }} </span>
+            </td>
+
+            <td>
+              <div class="user-name-cell">
+                <span class="user-avatar">
+                  {{ (user.name || "U").charAt(0).toUpperCase() }}
+                </span>
+
+                <strong>{{ user.name || "Unknown User" }}</strong>
+              </div>
+            </td>
+
+            <td class="email-cell">
+              {{ user.email || "Not available" }}
+            </td>
+
+            <td>
+              <span
+                class="role-badge"
+                [ngClass]="'role-' + (user.role || 'unknown').toLowerCase()"
+              >
+                {{ user.role || "Unknown" }}
+              </span>
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="user.is_active"
+                [class.status-blocked]="!user.is_active"
+              >
+                <span class="status-dot"></span>
+                {{ user.is_active ? "Active" : "Blocked" }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing {{ users.length }} registered accounts</span>
+      <span class="secure-label">● Secure Admin View</span>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #empty>
+    <div class="card empty" *ngIf="!error">
+      <div class="empty-icon">♙</div>
+      <h3>No users found</h3>
+      <p>There are currently no registered accounts to display.</p>
+    </div>
+  </ng-template>
+</div>

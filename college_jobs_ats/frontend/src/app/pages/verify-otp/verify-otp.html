@@ -1,0 +1,38 @@
+<div class="otp-wrap">
+  <div class="otp-card">
+    <p class="eyebrow">VERIFY EMAIL</p>
+    <h2>Enter your code</h2>
+    <p class="sub">We sent a 6-digit code to <strong>{{ email }}</strong></p>
+
+    <input
+      class="otp-input"
+      type="text"
+      inputmode="numeric"
+      maxlength="6"
+      placeholder="000000"
+      [(ngModel)]="otp"
+      (input)="onOtpInput()"
+      (keyup.enter)="verify()"
+    />
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="info" *ngIf="info">{{ info }}</p>
+
+    <button
+      class="btn"
+      (click)="verify()"
+      [disabled]="loading || otp.length !== 6"
+    >
+      {{ loading ? 'Verifying...' : 'Verify Email' }}
+    </button>
+
+    <p class="resend">
+      Didn't get it?
+      <button class="link" (click)="resend()" [disabled]="cooldown > 0">
+        {{ cooldown > 0 ? 'Resend in ' + cooldown + 's' : 'Resend code' }}
+      </button>
+    </p>
+
+    <p class="resend"><a routerLink="/register">Wrong email? Go back</a></p>
+  </div>
+</div>

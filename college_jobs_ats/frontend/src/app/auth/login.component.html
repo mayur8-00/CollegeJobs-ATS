@@ -1,0 +1,72 @@
+<div class="login-page">
+  <div class="login-visual">
+    <div class="visual-orb orb-one"></div>
+    <div class="visual-orb orb-two"></div>
+    <div class="visual-content">
+      <div class="brand-line">
+        <!-- <span class="brand-mark">CJ</span><strong>CollegeJobs</strong> -->
+      </div>
+      <span class="eyebrow">PLACEMENT • ATS • CAREERS</span>
+      <h1>One platform for smarter campus hiring.</h1>
+      <p>
+        Connect students, companies and placement teams with a fast, transparent
+        hiring workflow and built-in resume matching.
+      </p>
+      <div class="feature-row">
+        <span>✓ Role-based access</span><span>✓ Built-in ATS</span
+        ><span>✓ Responsive workspace</span>
+      </div>
+    </div>
+  </div>
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="mobile-brand">
+        <span class="brand-mark">CJ</span><strong>CollegeJobs</strong>
+      </div>
+      <span class="eyebrow dark">WELCOME BACK</span>
+      <h2>Sign in to your workspace</h2>
+      <p class="subtitle">Sign in with your registered account.</p>
+      <form (ngSubmit)="submit()">
+        <label>Email</label>
+        <div class="input-wrap">
+          <span>✉</span
+          ><input
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <label>Password</label>
+        <div class="input-wrap">
+          <span>●</span
+          ><input
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            required
+          /><button type="button" (click)="showPassword = !showPassword">
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+        <button class="login-button" type="submit" [disabled]="loading">
+          <span>{{ loading ? "Signing you in…" : "Sign in" }}</span
+          ><span>{{ loading ? "◌" : "→" }}</span>
+        </button>
+        <div class="error" *ngIf="error">{{ error }}</div>
+        <div class="info" *ngIf="info">{{ info }}</div>
+      </form>
+      <div class="register-link">
+        <span>New student?</span>
+
+        <button type="button" (click)="goToRegister()">
+          Create an account
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

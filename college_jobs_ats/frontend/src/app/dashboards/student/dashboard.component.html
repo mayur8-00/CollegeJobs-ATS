@@ -1,0 +1,344 @@
+<div class="student-dashboard">
+  <header class="topbar">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="search"
+        placeholder="Search jobs, companies, skills..."
+        aria-label="Search jobs"
+        (keydown.enter)="navigateTo('/student/jobs')"
+      />
+      <span class="shortcut">Ctrl + K</span>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="online-badge">
+        <span class="online-dot"></span>
+        Platform online
+      </span>
+
+      <button
+        type="button"
+        class="icon-button"
+        aria-label="View notifications"
+        title="Notifications"
+        (click)="navigateTo('/student/applications')"
+      >
+        ♧
+        <span class="notification-dot"></span>
+      </button>
+
+      <div class="profile-mini">
+        <div class="avatar">{{ studentName.charAt(0).toUpperCase() }}</div>
+        <div class="profile-mini-text">
+          <strong>{{ studentName }}</strong>
+          <span>Student</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <section class="welcome-banner">
+      <div class="welcome-copy">
+        <span class="eyebrow">✦ STUDENT WORKSPACE</span>
+
+        <h1>Welcome back, {{ studentName }} <span class="wave">👋</span></h1>
+
+        <p>
+          Discover great opportunities, apply for jobs, and build your dream
+          career with CollegeJobs ATS.
+        </p>
+
+        <div class="welcome-meta">
+          <span class="meta-pill success">
+            <span class="online-dot"></span>
+            Platform online
+          </span>
+
+          <span class="meta-pill">
+            <span>▦</span>
+            {{ currentDate | date: "dd MMM yyyy" }}, {{ currentTime }}
+          </span>
+
+          <span class="meta-pill">
+            <span>◇</span>
+            Your data is secure
+          </span>
+        </div>
+      </div>
+
+      <div class="welcome-art" aria-hidden="true">
+        <div class="art-glow"></div>
+
+        <div class="art-card card-one">
+          <span>✓</span>
+          <div>
+            <b>Profile ready</b>
+            <small>Keep moving forward</small>
+          </div>
+        </div>
+
+        <div class="art-person">🧑‍💻</div>
+
+        <div class="art-card card-two">
+          <span>✦</span>
+          <div>
+            <b>Your next opportunity</b>
+            <small>Could be just ahead</small>
+          </div>
+        </div>
+
+        <div class="art-spark spark-one">✦</div>
+        <div class="art-spark spark-two">✧</div>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Your career statistics">
+      <button
+        type="button"
+        class="stat-card"
+        *ngFor="let stat of stats; trackBy: trackByLabel"
+        [ngClass]="'stat-' + stat.color"
+        (click)="navigateTo(stat.route)"
+      >
+        <div class="stat-top">
+          <span class="stat-icon">{{ stat.icon }}</span>
+          <span class="stat-arrow">↗</span>
+        </div>
+
+        <span class="stat-label">{{ stat.label }}</span>
+        <strong class="stat-value">{{ stat.value }}</strong>
+
+        <div class="stat-bottom">
+          <span class="stat-change">{{ stat.change }}</span>
+          <span class="stat-period">vs last month</span>
+        </div>
+
+        <svg class="sparkline" viewBox="0 0 120 38" aria-hidden="true">
+          <path
+            d="M2 30 C12 28,14 9,25 16 S40 30,49 18 S65 26,75 15 S92 30,104 12 S114 15,118 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+
+          <path
+            d="M2 30 C12 28,14 9,25 16 S40 30,49 18 S65 26,75 15 S92 30,104 12 S114 15,118 7 L118 38 L2 38 Z"
+            fill="currentColor"
+            opacity=".08"
+          />
+        </svg>
+      </button>
+    </section>
+
+    <div class="dashboard-columns">
+      <div class="main-column">
+        <section class="panel progress-panel">
+          <div class="panel-heading">
+            <div class="heading-icon purple-bg">▣</div>
+
+            <div>
+              <h2>Your Application Progress</h2>
+              <p>Track your journey from application to interview</p>
+            </div>
+
+            <span class="live-tag">
+              <span class="online-dot"></span>
+              Live
+            </span>
+          </div>
+
+          <div class="progress-track">
+            <div
+              class="progress-step"
+              *ngFor="let stage of stages"
+              [class.complete]="stage.state === 'complete'"
+              [class.active]="stage.state === 'active'"
+              [class.pending]="stage.state === 'pending'"
+            >
+              <div class="step-circle">{{ stage.icon }}</div>
+              <strong>{{ stage.title }}</strong>
+              <span>
+                {{ stage.count }}
+                {{ stage.count === 1 ? "job" : "jobs" }}
+              </span>
+            </div>
+          </div>
+
+          <div class="progress-cta">
+            <div class="target-icon">◎</div>
+
+            <div class="progress-cta-copy">
+              <strong>Boost your chances!</strong>
+              <p>
+                Keep your resume updated and complete coding assessments to
+                prepare for more opportunities.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="primary-button"
+              (click)="navigateTo('/student/resume-builder')"
+            >
+              Update profile <span>→</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel quick-panel">
+          <div class="panel-heading">
+            <div class="heading-icon orange-bg">ϟ</div>
+
+            <div>
+              <h2>Quick Actions</h2>
+              <p>Get to what you need, faster</p>
+            </div>
+          </div>
+
+          <div class="quick-grid">
+            <button
+              type="button"
+              class="quick-action"
+              *ngFor="let action of quickActions"
+              (click)="navigateTo(action.route)"
+            >
+              <span class="quick-icon" [ngClass]="'quick-' + action.color">
+                {{ action.icon }}
+              </span>
+
+              <span class="quick-copy">
+                <strong>{{ action.title }}</strong>
+                <small>{{ action.subtitle }}</small>
+              </span>
+
+              <span class="quick-arrow">→</span>
+            </button>
+
+            <!-- NEW: Help and FAQ -->
+            <button
+              type="button"
+              class="quick-action"
+              (click)="navigateTo('/faq')"
+              aria-label="Open Help and FAQ"
+            >
+              <span class="quick-icon quick-purple">?</span>
+
+              <span class="quick-copy">
+                <strong>Help &amp; FAQ</strong>
+                <small>Find answers and get support</small>
+              </span>
+
+              <span class="quick-arrow">→</span>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="panel recommended-panel">
+          <div class="panel-heading">
+            <div class="heading-icon blue-bg">♧</div>
+
+            <div>
+              <h2>Recommended for You</h2>
+              <p>Roles to explore next</p>
+            </div>
+
+            <button
+              type="button"
+              class="text-button"
+              (click)="navigateTo('/student/jobs')"
+            >
+              View all →
+            </button>
+          </div>
+
+          <div class="job-list">
+            <button
+              type="button"
+              class="recommended-job"
+              *ngFor="let job of recommendedJobs; trackBy: trackByJob"
+              (click)="openJob(job.id)"
+            >
+              <span class="company-mark" [ngClass]="'mark-' + job.color">
+                {{ job.company.charAt(0) }}
+              </span>
+
+              <span class="job-info">
+                <strong>{{ job.title }}</strong>
+                <small>{{ job.company }}</small>
+
+                <span class="skill-tags">
+                  <span *ngFor="let skill of job.skills">
+                    {{ skill }}
+                  </span>
+                </span>
+              </span>
+
+              <span class="job-arrow">→</span>
+            </button>
+
+            <p class="empty-jobs" *ngIf="!recommendedJobs.length && !loading">
+              No recommended jobs are available right now.
+
+              <button type="button" (click)="navigateTo('/student/jobs')">
+                Browse all jobs
+              </button>
+            </p>
+          </div>
+        </section>
+
+        <section class="resume-tips">
+          <div class="tips-illustration" aria-hidden="true">✦</div>
+
+          <div class="tips-heading">
+            <span class="bulb-icon">♧</span>
+
+            <div>
+              <h2>Resume Tips</h2>
+              <p>Make your profile stand out</p>
+            </div>
+          </div>
+
+          <ul>
+            <li *ngFor="let tip of resumeTips">
+              <span class="tip-check">✓</span>
+              {{ tip }}
+            </li>
+          </ul>
+          <button
+            type="button"
+            class="tips-link"
+            (click)="navigateTo('/student/resume-builder')"
+          >
+            Improve your profile <span>→</span>
+          </button>
+        </section>
+      </aside>
+    </div>
+
+    <p class="dashboard-error" *ngIf="loadError" role="alert">
+      {{ loadError }}
+
+      <button type="button" (click)="loadDashboard()">Try again</button>
+    </p>
+
+    <footer class="dashboard-footer">
+      <span>
+        CollegeJobs ATS <span class="footer-separator">•</span> Student Portal
+      </span>
+
+      <span class="footer-status">
+        <span class="online-dot"></span>
+        Online <span class="footer-separator">|</span>
+        {{ currentDate | date: "dd MMM yyyy" }}, {{ currentTime }}
+      </span>
+
+      <!-- NEW: Footer FAQ link -->
+      <a routerLink="/faq" class="footer-help-link"> Help &amp; FAQ </a>
+    </footer>
+  </main>
+</div>

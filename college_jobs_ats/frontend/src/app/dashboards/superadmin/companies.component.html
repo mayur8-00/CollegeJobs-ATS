@@ -1,0 +1,153 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">COMPANY MANAGEMENT</span>
+      <h1>Companies</h1>
+      <p>Manage registered companies, verification and account status.</p>
+    </div>
+
+    <button class="refresh-btn" type="button" (click)="refresh()">
+      ↻ Refresh
+    </button>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span>Total Companies</span>
+      <strong>{{ totalCompanies }}</strong>
+    </div>
+
+    <div class="stat-card verified">
+      <span>Verified</span>
+      <strong>{{ verifiedCompanies }}</strong>
+    </div>
+
+    <div class="stat-card pending">
+      <span>Pending Verification</span>
+      <strong>{{ pendingCompanies }}</strong>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span>⌕</span>
+
+      <input
+        type="text"
+        [(ngModel)]="search"
+        placeholder="Search companies or email..."
+      />
+    </div>
+
+    <div class="filters">
+      <button
+        type="button"
+        [class.active]="filter === 'all'"
+        (click)="setFilter('all')"
+      >
+        All
+      </button>
+
+      <button
+        type="button"
+        [class.active]="filter === 'verified'"
+        (click)="setFilter('verified')"
+      >
+        Verified
+      </button>
+
+      <button
+        type="button"
+        [class.active]="filter === 'pending'"
+        (click)="setFilter('pending')"
+      >
+        Pending
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="state-card" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading companies...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="state-card error" *ngIf="!loading && error">
+    <strong>Unable to load companies</strong>
+    <p>{{ error }}</p>
+
+    <button type="button" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Empty -->
+  <div
+    class="state-card"
+    *ngIf="!loading && !error && filteredCompanies.length === 0"
+  >
+    <div class="empty-icon">⌂</div>
+
+    <h3>No companies found</h3>
+
+    <p>There are no companies matching your current search or filter.</p>
+  </div>
+
+  <!-- Companies -->
+  <div
+    class="company-table"
+    *ngIf="!loading && !error && filteredCompanies.length > 0"
+  >
+    <div class="table-header">
+      <span>Company</span>
+      <span>Email</span>
+      <span>Verification</span>
+      <span>Status</span>
+      <span>Joined</span>
+    </div>
+
+    <div class="company-row" *ngFor="let company of filteredCompanies">
+      <div class="company-info">
+        <div class="company-avatar">
+          {{ company.name.charAt(0).toUpperCase() }}
+        </div>
+
+        <div>
+          <strong>{{ company.name }}</strong>
+          <small>Company ID #{{ company.id }}</small>
+        </div>
+      </div>
+
+      <div class="email">
+        {{ company.email }}
+      </div>
+
+      <div>
+        <span
+          class="badge"
+          [class.verified]="company.is_verified"
+          [class.pending]="!company.is_verified"
+        >
+          <span class="dot"></span>
+
+          {{ company.is_verified ? "Verified" : "Pending" }}
+        </span>
+      </div>
+
+      <div>
+        <span
+          class="status"
+          [class.active]="company.is_active"
+          [class.inactive]="!company.is_active"
+        >
+          {{ company.is_active ? "Active" : "Inactive" }}
+        </span>
+      </div>
+
+      <div class="date">
+        {{ company.created_at | date: "dd MMM yyyy" }}
+      </div>
+    </div>
+  </div>
+</div>

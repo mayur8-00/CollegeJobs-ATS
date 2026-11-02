@@ -1,0 +1,100 @@
+<main class="coding-results">
+  <header class="hero">
+    <div>
+      <span class="eyebrow">CANDIDATE EVALUATION</span>
+      <h1>Coding assessment results</h1>
+      <p>
+        Compare submitted coding assessments and identify candidates with strong
+        test performance.
+      </p>
+    </div>
+    <button type="button" (click)="refresh()" [disabled]="loading">
+      ↻ Refresh
+    </button>
+  </header>
+
+  <section class="metrics">
+    <article>
+      <span>Candidate / job results</span><strong>{{ results.length }}</strong>
+    </article>
+    <article>
+      <span>Average score</span
+      ><strong>{{ averageScore | number: "1.0-1" }}%</strong>
+    </article>
+    <article>
+      <span>Scores ≥ 80%</span><strong>{{ highScoreCount }}</strong>
+    </article>
+  </section>
+
+  <section class="filters">
+    <input
+      [(ngModel)]="search"
+      placeholder="Search candidate, email, job or student ID"
+    />
+    <select [(ngModel)]="jobFilter">
+      <option value="all">All jobs</option>
+      <option *ngFor="let job of jobs" [value]="job">{{ job }}</option>
+    </select>
+    <select [(ngModel)]="sort">
+      <option value="score">Highest score first</option>
+      <option value="tests">Most tests passed</option>
+      <option value="newest">Latest submission</option>
+      <option value="name">Candidate name</option>
+    </select>
+  </section>
+
+  <section class="state" *ngIf="loading">Loading assessment results…</section>
+  <section class="state error" *ngIf="!loading && error">
+    <strong>Unable to load results</strong>
+    <p>{{ error }}</p>
+    <button (click)="refresh()">Try again</button>
+  </section>
+  <section class="state" *ngIf="!loading && !error && filtered.length === 0">
+    No submitted coding assessments match these filters.
+  </section>
+
+  <section class="table-wrap" *ngIf="!loading && !error && filtered.length">
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Candidate</th>
+          <th>Job</th>
+          <th>Coding score</th>
+          <th>Tests passed</th>
+          <th>Questions</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filtered; let i = index">
+          <td>
+            <span class="rank">{{ i + 1 }}</span>
+          </td>
+          <td>
+            <strong>{{ item.student_name }}</strong
+            ><small>{{ item.student_email }}</small
+            ><small>ID #{{ item.student_id }}</small>
+          </td>
+          <td>
+            <strong>{{ item.job_title }}</strong
+            ><small>Job #{{ item.job_id }}</small>
+          </td>
+          <td>
+            <div class="score">
+              <strong>{{ item.score }}%</strong
+              ><span><i [style.width.%]="item.score"></i></span>
+            </div>
+          </td>
+          <td>{{ item.passed_tests }} / {{ item.total_tests }}</td>
+          <td>{{ item.questions_submitted }}</td>
+          <td>{{ date(item.submitted_at) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <p class="note">
+    Rankings use the latest saved submission per question. Review source code
+    and detailed execution errors through the job-specific results API.
+  </p>
+</main>

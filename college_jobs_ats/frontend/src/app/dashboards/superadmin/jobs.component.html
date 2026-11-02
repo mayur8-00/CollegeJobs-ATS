@@ -1,0 +1,460 @@
+<div class="jobs-page">
+  <!-- HERO HEADER -->
+  <section class="jobs-hero">
+    <div class="hero-background">
+      <div class="hero-orb hero-orb-one"></div>
+      <div class="hero-orb hero-orb-two"></div>
+      <div class="hero-grid"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          ADMIN JOB MANAGEMENT
+        </div>
+
+        <h1>
+          Manage your
+          <span>opportunities.</span>
+        </h1>
+
+        <p>
+          Create, monitor and organize job opportunities across your placement
+          ecosystem.
+        </p>
+      </div>
+
+      <button
+        class="refresh-button"
+        type="button"
+        (click)="refresh()"
+        [disabled]="loading"
+      >
+        <span class="refresh-icon" [class.spinning]="loading">↻</span>
+        Refresh
+      </button>
+    </div>
+  </section>
+
+  <!-- STATISTICS -->
+  <section class="stats-grid">
+    <div class="stat-card stat-blue">
+      <div class="stat-icon">▣</div>
+      <div class="stat-content">
+        <span class="stat-label">Total Jobs</span>
+        <strong>{{ totalJobs }}</strong>
+        <small>All opportunities</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-green">
+      <div class="stat-icon">✓</div>
+      <div class="stat-content">
+        <span class="stat-label">Active Jobs</span>
+        <strong>{{ activeJobs }}</strong>
+        <small>Currently available</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">⌖</div>
+      <div class="stat-content">
+        <span class="stat-label">Locations</span>
+        <strong>{{ locationsCount }}</strong>
+        <small>Hiring locations</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-orange">
+      <div class="stat-icon">✦</div>
+      <div class="stat-content">
+        <span class="stat-label">Skills</span>
+        <strong>{{ uniqueSkillsCount }}</strong>
+        <small>Skills in demand</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH AND FILTERS -->
+  <section class="toolbar">
+    <div class="search-wrapper">
+      <span class="search-icon">⌕</span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search job title, skill, location or company..."
+        aria-label="Search jobs"
+      />
+
+      <button
+        *ngIf="searchTerm"
+        type="button"
+        class="clear-search"
+        (click)="searchTerm = ''; onSearch()"
+        aria-label="Clear search"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <select
+        [(ngModel)]="selectedLocation"
+        (change)="applyFilters()"
+        aria-label="Filter by location"
+      >
+        <option value="all">All locations</option>
+        <option *ngFor="let location of locations" [value]="location">
+          {{ location }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="selectedStatus"
+        (change)="applyFilters()"
+        aria-label="Filter by status"
+      >
+        <option value="all">All status</option>
+        <option value="active">Active</option>
+        <option value="closed">Closed</option>
+        <option value="draft">Draft</option>
+      </select>
+
+      <select
+        [(ngModel)]="sortBy"
+        (change)="applyFilters()"
+        aria-label="Sort jobs"
+      >
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+      </select>
+
+      <button type="button" class="filter-clear" (click)="clearFilters()">
+        Reset filters
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULTS HEADER -->
+  <section class="results-header">
+    <div>
+      <span class="results-eyebrow">OPPORTUNITIES</span>
+      <h2>Available positions</h2>
+      <p>Explore and manage all posted job opportunities.</p>
+    </div>
+
+    <div class="results-meta">
+      <span class="result-count">{{ filteredJobs.length }}</span>
+      <span>of {{ totalJobs }} jobs</span>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <section class="loading-grid" *ngIf="loading">
+    <div class="skeleton-card" *ngFor="let item of [1, 2, 3, 4]">
+      <div class="skeleton skeleton-small"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line short"></div>
+
+      <div class="skeleton-skills">
+        <span class="skeleton skeleton-chip"></span>
+        <span class="skeleton skeleton-chip"></span>
+        <span class="skeleton skeleton-chip"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ERROR -->
+  <section class="state-card error-state" *ngIf="!loading && error">
+    <div class="state-icon">!</div>
+    <h3>Unable to load jobs</h3>
+    <p>{{ error }}</p>
+
+    <button type="button" class="primary-button" (click)="refresh()">
+      Try Again
+    </button>
+  </section>
+
+  <!-- EMPTY -->
+  <section
+    class="state-card empty-state"
+    *ngIf="!loading && !error && filteredJobs.length === 0"
+  >
+    <div class="empty-illustration">
+      <span class="empty-box">◫</span>
+      <span class="empty-spark spark-one">✦</span>
+      <span class="empty-spark spark-two">•</span>
+    </div>
+
+    <h3>No jobs found</h3>
+    <p>We couldn't find any jobs matching your current search or filters.</p>
+
+    <button type="button" class="primary-button" (click)="clearFilters()">
+      Clear Filters
+    </button>
+  </section>
+
+  <!-- JOB CARDS -->
+  <section
+    class="jobs-grid"
+    *ngIf="!loading && !error && filteredJobs.length > 0"
+  >
+    <article
+      class="job-card"
+      *ngFor="let job of filteredJobs; trackBy: trackByJob"
+    >
+      <div class="job-card-top">
+        <span class="status-badge" [ngClass]="getStatusClass(job)">
+          <span class="status-dot"></span>
+          {{ getJobStatus(job) }}
+        </span>
+
+        <span class="job-id">#{{ job.id || "—" }}</span>
+      </div>
+
+      <div class="company-line">
+        <div class="company-avatar">
+          {{ getCompanyInitial(job) }}
+        </div>
+
+        <span>{{ getCompanyName(job) }}</span>
+        <span class="verified-mark" title="Company">✓</span>
+      </div>
+
+      <h3 class="job-title">
+        {{ job.title || "Untitled Position" }}
+      </h3>
+
+      <p class="job-description">
+        {{ shortDescription(job.description) }}
+      </p>
+
+      <div class="job-meta">
+        <div class="meta-item">
+          <span class="meta-icon">⌖</span>
+          <span>{{ job.location || "Location not specified" }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-icon">◷</span>
+          <span>{{ getJobType(job) }}</span>
+        </div>
+      </div>
+
+      <div class="skills-section">
+        <span class="skills-label">REQUIRED SKILLS</span>
+
+        <div class="skill-list">
+          <span
+            class="skill-chip"
+            *ngFor="let skill of parseSkills(job.skills).slice(0, 4)"
+          >
+            {{ skill }}
+          </span>
+
+          <span
+            class="skill-chip more"
+            *ngIf="parseSkills(job.skills).length > 4"
+          >
+            +{{ parseSkills(job.skills).length - 4 }} more
+          </span>
+
+          <span class="no-skills" *ngIf="parseSkills(job.skills).length === 0">
+            Skills not specified
+          </span>
+        </div>
+      </div>
+
+      <div class="job-card-footer">
+        <div class="posted-date">
+          <span class="date-icon">◷</span>
+          <span>{{ formatDate(job.created_at) }}</span>
+        </div>
+
+        <button
+          type="button"
+          class="view-details-btn"
+          (click)="openDetails(job)"
+          [attr.aria-label]="'View details for ' + (job.title || 'job')"
+        >
+          <span>View Details</span>
+          <span class="details-arrow">↗</span>
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <!-- PREMIUM JOB DETAILS MODAL -->
+  <div
+    class="details-modal-overlay"
+    *ngIf="showDetails && selectedJob"
+    (click)="closeDetails()"
+  >
+    <section
+      class="details-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="details-job-title"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- MODAL HEADER -->
+      <header class="details-modal-header">
+        <div class="modal-header-brand">
+          <div class="modal-brand-icon">
+            {{ getCompanyInitial(selectedJob) }}
+          </div>
+
+          <div class="modal-brand-text">
+            <span class="modal-overline">COMPANY PROFILE</span>
+            <strong>{{ getCompanyName(selectedJob) }}</strong>
+            <small>Hiring opportunity</small>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close-btn"
+          (click)="closeDetails()"
+          aria-label="Close job details"
+        >
+          ×
+        </button>
+      </header>
+
+      <!-- MODAL BODY -->
+      <div class="details-modal-body">
+        <!-- JOB TITLE AREA -->
+        <div class="modal-title-section">
+          <div class="modal-title-topline">
+            <span class="modal-job-label">JOB OPPORTUNITY</span>
+
+            <span class="status-badge" [ngClass]="getStatusClass(selectedJob)">
+              <span class="status-dot"></span>
+              {{ getJobStatus(selectedJob) }}
+            </span>
+          </div>
+
+          <h2 id="details-job-title">
+            {{ selectedJob.title || "Untitled Position" }}
+          </h2>
+
+          <p class="modal-subtitle">
+            <span>{{ getCompanyName(selectedJob) }}</span>
+            <span class="subtitle-separator">•</span>
+            <span>Job ID #{{ selectedJob.id || "—" }}</span>
+          </p>
+        </div>
+
+        <!-- QUICK INFORMATION -->
+        <div class="modal-info-grid">
+          <div class="modal-info-card">
+            <div class="modal-info-icon location-icon">⌖</div>
+            <div>
+              <span>LOCATION</span>
+              <strong>{{ selectedJob.location || "Not specified" }}</strong>
+            </div>
+          </div>
+
+          <div class="modal-info-card">
+            <div class="modal-info-icon employment-icon">◷</div>
+            <div>
+              <span>EMPLOYMENT TYPE</span>
+              <strong>{{ getJobType(selectedJob) }}</strong>
+            </div>
+          </div>
+
+          <div class="modal-info-card">
+            <div class="modal-info-icon date-info-icon">▦</div>
+            <div>
+              <span>POSTED DATE</span>
+              <strong>{{ formatDate(selectedJob.created_at) }}</strong>
+            </div>
+          </div>
+
+          <div class="modal-info-card">
+            <div class="modal-info-icon company-info-icon">▣</div>
+            <div>
+              <span>COMPANY</span>
+              <strong>{{ getCompanyName(selectedJob) }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <section class="modal-detail-section">
+          <div class="section-heading">
+            <div class="section-heading-icon">▤</div>
+            <div>
+              <span>JOB INFORMATION</span>
+              <h3>About the role</h3>
+            </div>
+          </div>
+
+          <p class="modal-description">
+            {{
+              selectedJob.description ||
+                "No detailed job description has been provided."
+            }}
+          </p>
+        </section>
+
+        <!-- SKILLS -->
+        <section class="modal-detail-section">
+          <div class="section-heading">
+            <div class="section-heading-icon skills-heading-icon">✦</div>
+            <div>
+              <span>WHAT YOU NEED</span>
+              <h3>Required skills</h3>
+            </div>
+          </div>
+
+          <div class="modal-skills-list">
+            <span
+              class="modal-skill-chip"
+              *ngFor="let skill of parseSkills(selectedJob.skills)"
+            >
+              <span>✓</span>
+              {{ skill }}
+            </span>
+
+            <p
+              class="modal-no-skills"
+              *ngIf="parseSkills(selectedJob.skills).length === 0"
+            >
+              No specific skills have been listed for this position.
+            </p>
+          </div>
+        </section>
+
+        <!-- POSTING INFORMATION -->
+        <div class="modal-posting-note">
+          <span class="posting-note-icon">ⓘ</span>
+          <p>
+            This job was published on
+            <strong>{{ formatDate(selectedJob.created_at) }}</strong
+            >. Review the job information carefully.
+          </p>
+        </div>
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <footer class="details-modal-footer">
+        <div class="footer-job-reference">
+          <span class="footer-reference-dot"></span>
+          <span>Job reference: #{{ selectedJob.id || "—" }}</span>
+        </div>
+
+        <button type="button" class="modal-done-btn" (click)="closeDetails()">
+          Close Details
+          <span>×</span>
+        </button>
+      </footer>
+    </section>
+  </div>
+</div>

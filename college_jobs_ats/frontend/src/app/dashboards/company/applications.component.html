@@ -1,0 +1,665 @@
+<div class="applications-page">
+  <!-- Page header -->
+  <section class="page-header">
+    <div class="header-content">
+      <div>
+        <div class="eyebrow">TALENT MANAGEMENT</div>
+        <h1>Applications</h1>
+        <p>
+          Review candidates, analyze ATS scores and manage your hiring pipeline.
+        </p>
+      </div>
+
+      <button
+        class="refresh-btn"
+        type="button"
+        (click)="refresh()"
+        [disabled]="loading"
+      >
+        <span class="refresh-icon" [class.spin]="loading">↻</span>
+        Refresh
+      </button>
+    </div>
+  </section>
+
+  <!-- KPI cards -->
+  <section class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">◉</div>
+      <div>
+        <span class="stat-label">Total Applications</span>
+        <strong>{{ totalCount }}</strong>
+        <small>All candidates</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-review">
+      <div class="stat-icon">◌</div>
+      <div>
+        <span class="stat-label">Reviewing</span>
+        <strong>{{ reviewingCount }}</strong>
+        <small>Under review</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-shortlisted">
+      <div class="stat-icon">★</div>
+      <div>
+        <span class="stat-label">Shortlisted</span>
+        <strong>{{ shortlistedCount }}</strong>
+        <small>Potential hires</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-selected">
+      <div class="stat-icon">✓</div>
+      <div>
+        <span class="stat-label">Selected</span>
+        <strong>{{ selectedCount }}</strong>
+        <small>Selected candidates</small>
+      </div>
+    </div>
+
+    <div class="stat-card stat-score">
+      <div class="stat-icon">%</div>
+      <div>
+        <span class="stat-label">Avg ATS Score</span>
+        <strong>{{ averageScore }}%</strong>
+        <small>Candidate quality</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search and filters -->
+  <section class="control-panel">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        [(ngModel)]="search"
+        (input)="onSearch()"
+        placeholder="Search candidate, email, job or application ID..."
+      />
+      <button
+        *ngIf="search"
+        type="button"
+        class="clear-search"
+        aria-label="Clear search"
+        (click)="search = ''; onSearch()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <label>Status</label>
+      <select
+        [(ngModel)]="statusFilter"
+        (ngModelChange)="changeStatusFilter($event)"
+      >
+        <option value="all">All statuses</option>
+        <option value="applied">Applied</option>
+        <option value="reviewing">Reviewing</option>
+        <option value="shortlisted">Shortlisted</option>
+        <option value="selected">Selected</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>ATS Score</label>
+      <select
+        [(ngModel)]="scoreFilter"
+        (ngModelChange)="changeScoreFilter($event)"
+      >
+        <option value="all">All scores</option>
+        <option value="excellent">80%+</option>
+        <option value="good">60% – 79%</option>
+        <option value="low">Below 60%</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Sort</label>
+      <select [(ngModel)]="sort" (ngModelChange)="changeSort($event)">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="highest">Highest ATS</option>
+        <option value="lowest">Lowest ATS</option>
+        <option value="candidate">Candidate A–Z</option>
+      </select>
+    </div>
+
+    <button type="button" class="reset-btn" (click)="clearFilters()">
+      Reset
+    </button>
+  </section>
+
+  <!-- Status filters -->
+  <section class="status-tabs">
+    <button
+      type="button"
+      [class.active]="statusFilter === 'all'"
+      (click)="changeStatusFilter('all')"
+    >
+      All <span>{{ totalCount }}</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="statusFilter === 'applied'"
+      (click)="changeStatusFilter('applied')"
+    >
+      Applied <span>{{ appliedCount }}</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="statusFilter === 'reviewing'"
+      (click)="changeStatusFilter('reviewing')"
+    >
+      Reviewing <span>{{ reviewingCount }}</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="statusFilter === 'shortlisted'"
+      (click)="changeStatusFilter('shortlisted')"
+    >
+      Shortlisted <span>{{ shortlistedCount }}</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="statusFilter === 'selected'"
+      (click)="changeStatusFilter('selected')"
+    >
+      Selected <span>{{ selectedCount }}</span>
+    </button>
+    <button
+      type="button"
+      [class.active]="statusFilter === 'rejected'"
+      (click)="changeStatusFilter('rejected')"
+    >
+      Rejected <span>{{ rejectedCount }}</span>
+    </button>
+  </section>
+
+  <!-- Error -->
+  <div class="error-box" *ngIf="error">
+    <div>
+      <strong>Unable to load applications</strong>
+      <p>{{ error }}</p>
+    </div>
+    <button type="button" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Loading -->
+  <section class="loading-card" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <h3>Loading applications...</h3>
+    <p>Fetching candidate and ATS information.</p>
+  </section>
+
+  <!-- Empty state -->
+  <section
+    class="empty-card"
+    *ngIf="!loading && !error && filteredApplications.length === 0"
+  >
+    <div class="empty-icon">◎</div>
+    <h2>No applications found</h2>
+    <p>Try changing your search or filters.</p>
+    <button type="button" (click)="clearFilters()">Clear Filters</button>
+  </section>
+
+  <!-- Candidate pipeline -->
+  <section
+    class="table-card"
+    *ngIf="!loading && !error && filteredApplications.length > 0"
+  >
+    <div class="table-header">
+      <div>
+        <h2>Candidate Pipeline</h2>
+        <p>
+          Showing
+          <strong>{{ (page - 1) * pageSize + 1 }}</strong>
+          –
+          <strong>{{
+            Math.min(page * pageSize, filteredApplications.length)
+          }}</strong>
+          of
+          <strong>{{ filteredApplications.length }}</strong>
+          applications
+        </p>
+      </div>
+      <div class="table-summary">{{ selectedCountForView }} selected</div>
+    </div>
+
+    <!-- Only this container scrolls horizontally -->
+    <div class="table-wrapper">
+      <table class="applications-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Position</th>
+            <th>ATS Match</th>
+            <th>Breakdown</th>
+            <th>Recommendation</th>
+            <th>Status</th>
+            <th>Applied</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let app of paginatedApplications" class="application-row">
+            <!-- Candidate -->
+            <td>
+              <div class="candidate-cell">
+                <div class="avatar">{{ initials(app) }}</div>
+                <div class="candidate-info">
+                  <strong>{{ studentName(app) }}</strong>
+                  <span [title]="studentEmail(app)">{{
+                    studentEmail(app)
+                  }}</span>
+                  <small>Application #{{ app.id }}</small>
+                </div>
+              </div>
+            </td>
+
+            <!-- Position -->
+            <td>
+              <div class="job-cell">
+                <strong [title]="jobTitle(app)">{{ jobTitle(app) }}</strong>
+                <span>Job #{{ app.job_id }}</span>
+              </div>
+            </td>
+
+            <!-- ATS score -->
+            <td>
+              <div class="score-box" [ngClass]="scoreClass(score(app))">
+                <div
+                  class="score-circle"
+                  [style.--score]="(score(app) || 0) + '%'"
+                >
+                  <span *ngIf="score(app) !== null">
+                    {{ score(app) | number: "1.0-0" }}%
+                  </span>
+                  <span *ngIf="score(app) === null">—</span>
+                </div>
+                <div class="score-description">
+                  <strong>ATS Match</strong>
+                  <span>Resume analysis</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- ATS breakdown -->
+            <td>
+              <div class="breakdown">
+                <div>
+                  <span>Skills</span>
+                  <strong>
+                    {{
+                      app.skill_score !== null && app.skill_score !== undefined
+                        ? (app.skill_score | number: "1.0-0") + "%"
+                        : "—"
+                    }}
+                  </strong>
+                </div>
+                <div>
+                  <span>Education</span>
+                  <strong>
+                    {{
+                      app.education_score !== null &&
+                      app.education_score !== undefined
+                        ? (app.education_score | number: "1.0-0") + "%"
+                        : "—"
+                    }}
+                  </strong>
+                </div>
+                <div>
+                  <span>Experience</span>
+                  <strong>
+                    {{
+                      app.experience_score !== null &&
+                      app.experience_score !== undefined
+                        ? (app.experience_score | number: "1.0-0") + "%"
+                        : "—"
+                    }}
+                  </strong>
+                </div>
+              </div>
+            </td>
+
+            <!-- Recommendation -->
+            <td>
+              <span
+                class="recommendation"
+                [ngClass]="recommendationClass(app.ats_recommendation)"
+              >
+                <span class="recommendation-dot"></span>
+                {{ app.ats_recommendation || "ATS Pending" }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span class="status-badge" [ngClass]="statusClass(app.status)">
+                <span class="status-dot"></span>
+                {{ app.status || "Applied" }}
+              </span>
+            </td>
+
+            <!-- Applied date -->
+            <td>
+              <span class="date-text">{{ formattedDate(app.created_at) }}</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="actions-cell">
+              <div class="actions">
+                <button
+                  type="button"
+                  class="view-btn"
+                  (click)="openDetails(app)"
+                >
+                  View Details
+                </button>
+
+                <button
+                  *ngIf="app.resume_filename"
+                  type="button"
+                  class="resume-btn"
+                  (click)="openResume($event, app)"
+                >
+                  View Resume
+                </button>
+
+                <span class="resume-unavailable" *ngIf="!app.resume_filename">
+                  No resume uploaded
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button
+        type="button"
+        class="page-arrow"
+        [disabled]="page === 1"
+        (click)="previousPage()"
+      >
+        ‹
+      </button>
+
+      <button
+        *ngFor="let pageNumber of pageNumbers"
+        type="button"
+        class="page-number"
+        [class.active]="pageNumber === page"
+        (click)="goToPage(pageNumber)"
+      >
+        {{ pageNumber }}
+      </button>
+
+      <button
+        type="button"
+        class="page-arrow"
+        [disabled]="page === totalPages"
+        (click)="nextPage()"
+      >
+        ›
+      </button>
+    </div>
+  </section>
+
+  <!-- Drawer overlay -->
+  <div
+    class="drawer-overlay"
+    *ngIf="selectedApplication"
+    (click)="closeDetails()"
+  ></div>
+
+  <!-- Candidate details drawer -->
+  <aside class="details-drawer" *ngIf="selectedApplication">
+    <div class="drawer-header">
+      <div>
+        <span class="drawer-eyebrow">APPLICATION DETAILS</span>
+        <h2>Candidate Profile</h2>
+      </div>
+      <button
+        type="button"
+        class="close-btn"
+        aria-label="Close details"
+        (click)="closeDetails()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Profile -->
+      <section class="profile-card">
+        <div class="large-avatar">{{ initials(selectedApplication) }}</div>
+        <div class="profile-info">
+          <h3>{{ studentName(selectedApplication) }}</h3>
+          <p>{{ studentEmail(selectedApplication) }}</p>
+          <span class="application-number"
+            >Application #{{ selectedApplication.id }}</span
+          >
+        </div>
+      </section>
+
+      <!-- Position -->
+      <section class="detail-section">
+        <div class="section-label">POSITION</div>
+        <h3>{{ jobTitle(selectedApplication) }}</h3>
+        <p>Job ID #{{ selectedApplication.job_id }}</p>
+      </section>
+
+      <!-- ATS analysis -->
+      <section class="detail-section">
+        <div class="section-heading">
+          <div>
+            <div class="section-label">ATS ANALYSIS</div>
+            <h3>Candidate Match</h3>
+          </div>
+          <div
+            class="drawer-score"
+            [ngClass]="scoreClass(score(selectedApplication))"
+          >
+            {{
+              score(selectedApplication) !== null
+                ? (score(selectedApplication) | number: "1.0-0") + "%"
+                : "—"
+            }}
+          </div>
+        </div>
+
+        <div class="ats-grid">
+          <div class="ats-card">
+            <span>Skills</span>
+            <strong>
+              {{
+                selectedApplication.skill_score !== null &&
+                selectedApplication.skill_score !== undefined
+                  ? (selectedApplication.skill_score | number: "1.0-0") + "%"
+                  : "—"
+              }}
+            </strong>
+          </div>
+          <div class="ats-card">
+            <span>Education</span>
+            <strong>
+              {{
+                selectedApplication.education_score !== null &&
+                selectedApplication.education_score !== undefined
+                  ? (selectedApplication.education_score | number: "1.0-0") +
+                    "%"
+                  : "—"
+              }}
+            </strong>
+          </div>
+          <div class="ats-card">
+            <span>Experience</span>
+            <strong>
+              {{
+                selectedApplication.experience_score !== null &&
+                selectedApplication.experience_score !== undefined
+                  ? (selectedApplication.experience_score | number: "1.0-0") +
+                    "%"
+                  : "—"
+              }}
+            </strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recommendation -->
+      <section class="detail-section">
+        <div class="section-label">ATS RECOMMENDATION</div>
+        <div
+          class="drawer-recommendation"
+          [ngClass]="
+            recommendationClass(selectedApplication.ats_recommendation)
+          "
+        >
+          <span class="recommendation-dot"></span>
+          {{ selectedApplication.ats_recommendation || "ATS Pending" }}
+        </div>
+      </section>
+
+      <!-- Matched skills -->
+      <section class="detail-section">
+        <div class="section-label">MATCHED SKILLS</div>
+        <div
+          class="skill-list"
+          *ngIf="skills(selectedApplication.matched_skills).length"
+        >
+          <span
+            class="skill-tag matched"
+            *ngFor="let skill of skills(selectedApplication.matched_skills)"
+          >
+            ✓ {{ skill }}
+          </span>
+        </div>
+        <p
+          class="muted"
+          *ngIf="!skills(selectedApplication.matched_skills).length"
+        >
+          No matched skills found.
+        </p>
+      </section>
+
+      <!-- Missing skills -->
+      <section class="detail-section">
+        <div class="section-label">MISSING SKILLS</div>
+        <div
+          class="skill-list"
+          *ngIf="skills(selectedApplication.missing_skills).length"
+        >
+          <span
+            class="skill-tag missing"
+            *ngFor="let skill of skills(selectedApplication.missing_skills)"
+          >
+            + {{ skill }}
+          </span>
+        </div>
+        <p
+          class="muted"
+          *ngIf="!skills(selectedApplication.missing_skills).length"
+        >
+          No missing skills detected.
+        </p>
+      </section>
+
+      <!-- ATS notes -->
+      <section class="detail-section" *ngIf="selectedApplication.ats_notes">
+        <div class="section-label">ATS NOTES</div>
+        <div class="notes-box">{{ selectedApplication.ats_notes }}</div>
+      </section>
+
+      <!-- Resume -->
+      <section class="detail-section">
+        <div class="section-label">RESUME</div>
+
+        <div class="resume-card">
+          <div class="resume-icon">PDF</div>
+          <div class="resume-info">
+            <strong [title]="selectedApplication.resume_filename || ''">
+              {{ selectedApplication.resume_filename || "Resume not uploaded" }}
+            </strong>
+            <span>Candidate resume</span>
+          </div>
+
+          <button
+            *ngIf="selectedApplication.resume_filename"
+            type="button"
+            class="resume-open"
+            (click)="openResume($event, selectedApplication)"
+          >
+            Open Resume
+          </button>
+        </div>
+      </section>
+
+      <!-- Application status -->
+      <section class="detail-section">
+        <div class="section-label">APPLICATION STATUS</div>
+
+        <div class="status-actions">
+          <button
+            type="button"
+            class="status-action applied"
+            [class.active]="selectedApplication.status === 'applied'"
+            [disabled]="updatingId === selectedApplication.id"
+            (click)="status(selectedApplication.id, 'applied')"
+          >
+            Applied
+          </button>
+
+          <button
+            type="button"
+            class="status-action reviewing"
+            [class.active]="selectedApplication.status === 'reviewing'"
+            [disabled]="updatingId === selectedApplication.id"
+            (click)="status(selectedApplication.id, 'reviewing')"
+          >
+            Reviewing
+          </button>
+
+          <button
+            type="button"
+            class="status-action shortlisted"
+            [class.active]="selectedApplication.status === 'shortlisted'"
+            [disabled]="updatingId === selectedApplication.id"
+            (click)="status(selectedApplication.id, 'shortlisted')"
+          >
+            Shortlist
+          </button>
+
+          <button
+            type="button"
+            class="status-action selected"
+            [class.active]="selectedApplication.status === 'selected'"
+            [disabled]="updatingId === selectedApplication.id"
+            (click)="status(selectedApplication.id, 'selected')"
+          >
+            Select
+          </button>
+
+          <button
+            type="button"
+            class="status-action rejected"
+            [class.active]="selectedApplication.status === 'rejected'"
+            [disabled]="updatingId === selectedApplication.id"
+            (click)="status(selectedApplication.id, 'rejected')"
+          >
+            Reject
+          </button>
+        </div>
+      </section>
+    </div>
+  </aside>
+</div>

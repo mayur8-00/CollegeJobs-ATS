@@ -1,0 +1,257 @@
+<div class="company-overview">
+  <section class="welcome-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        COMPANY WORKSPACE
+      </span>
+
+      <h1>Build your next <span>great team.</span></h1>
+
+      <p>
+        Manage open roles, discover talented candidates, and make smarter hiring
+        decisions with AI-powered resume screening.
+      </p>
+
+      <div class="hero-actions">
+        <a routerLink="/company/jobs" class="btn-primary">
+          <span>＋</span> Create a job <span class="arrow">↗</span>
+        </a>
+
+        <a routerLink="/company/applications" class="btn-secondary">
+          Review candidates <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="visual-orbit orbit-one"></div>
+      <div class="visual-orbit orbit-two"></div>
+
+      <div class="visual-center">
+        <span class="visual-icon">✦</span>
+        <strong>ATS</strong>
+        <small>Smart hiring</small>
+      </div>
+
+      <div class="floating-card float-top">
+        <span class="float-icon">✓</span>
+        <div>
+          <strong>AI screening</strong>
+          <small>Resume insights</small>
+        </div>
+      </div>
+
+      <div class="floating-card float-bottom">
+        <span class="float-icon purple">♙</span>
+        <div>
+          <strong>Top candidates</strong>
+          <small>Ready for review</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-heading">
+    <div>
+      <span class="section-kicker">YOUR HIRING SNAPSHOT</span>
+      <h2>Recruitment overview</h2>
+      <p>Here is what's happening across your hiring pipeline.</p>
+    </div>
+
+    <a routerLink="/company/applications" class="text-link">
+      View applications <span>→</span>
+    </a>
+  </section>
+
+  <section class="stats-grid">
+    <article class="stat-card stat-blue">
+      <div class="stat-top">
+        <div class="stat-icon">✦</div>
+        <span class="stat-label">OPEN ROLES</span>
+      </div>
+      <div class="stat-value">{{ stats.activeJobs }}</div>
+      <p>Published opportunities</p>
+      <div class="stat-footer">
+        <span class="status-dot"></span> Hiring workspace
+      </div>
+    </article>
+
+    <article class="stat-card stat-purple">
+      <div class="stat-top">
+        <div class="stat-icon">✓</div>
+        <span class="stat-label">APPLICATIONS</span>
+      </div>
+      <div class="stat-value">{{ stats.applications }}</div>
+      <p>Candidate submissions</p>
+      <div class="stat-footer">
+        <span class="mini-arrow">↗</span> Candidate pipeline
+      </div>
+    </article>
+
+    <article class="stat-card stat-green">
+      <div class="stat-top">
+        <div class="stat-icon">★</div>
+        <span class="stat-label">SELECTED</span>
+      </div>
+      <div class="stat-value">{{ stats.selected }}</div>
+      <p>Selected candidates</p>
+      <div class="stat-footer">
+        <span class="status-dot"></span> Hiring progress
+      </div>
+    </article>
+
+    <article class="stat-card stat-orange">
+      <div class="stat-top">
+        <div class="stat-icon">AI</div>
+        <span class="stat-label">RESUME SCREENING</span>
+      </div>
+      <div class="stat-value stat-word">ATS</div>
+      <p>Automated resume analysis</p>
+      <div class="stat-footer">
+        <span class="status-dot"></span> Screening insights
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="panel pipeline-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-kicker">CANDIDATE JOURNEY</span>
+          <h2>Hiring pipeline</h2>
+        </div>
+
+        <a
+          routerLink="/company/applications"
+          class="icon-link"
+          aria-label="View applications"
+          >↗</a
+        >
+      </div>
+
+      <p class="panel-description">
+        Track candidates as they move through your recruitment process.
+      </p>
+
+      <div class="pipeline-list">
+        <div class="pipeline-row">
+          <div class="pipeline-label">
+            <span class="pipeline-icon applied-icon">↗</span>
+            <span>Applications received</span>
+          </div>
+          <strong>{{ stats.applications }}</strong>
+        </div>
+
+        <div class="pipeline-row">
+          <div class="pipeline-label">
+            <span class="pipeline-icon review-icon">◷</span>
+            <span>Under review</span>
+          </div>
+          <strong>{{ stats.reviewing }}</strong>
+        </div>
+
+        <div class="pipeline-row">
+          <div class="pipeline-label">
+            <span class="pipeline-icon shortlisted-icon">◎</span>
+            <span>Shortlisted</span>
+          </div>
+          <strong>{{ stats.shortlisted }}</strong>
+        </div>
+
+        <div class="pipeline-row">
+          <div class="pipeline-label">
+            <span class="pipeline-icon selected-icon">✓</span>
+            <span>Selected</span>
+          </div>
+          <strong>{{ stats.selected }}</strong>
+        </div>
+      </div>
+
+      <a routerLink="/company/applications" class="panel-bottom-link">
+        Manage candidate pipeline <span>→</span>
+      </a>
+    </article>
+
+    <article class="panel actions-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="section-kicker">GET THINGS DONE</span>
+          <h2>Quick actions</h2>
+        </div>
+      </div>
+
+      <a routerLink="/company/jobs" class="action-item">
+        <span class="action-icon blue-bg">＋</span>
+        <span class="action-copy">
+          <strong>Publish a job</strong>
+          <small>Create a new opportunity</small>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <a routerLink="/company/applications" class="action-item">
+        <span class="action-icon purple-bg">♙</span>
+        <span class="action-copy">
+          <strong>Review applicants</strong>
+          <small>Explore candidate profiles</small>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <a routerLink="/company/coding-results" class="action-item">
+        <span class="action-icon green-bg">📊</span>
+        <span class="action-copy">
+          <strong>Coding-Assessment Results</strong>
+          <small>Review student assessment scores</small>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <a routerLink="/company/assessment-results" class="action-item">
+        <span class="action-icon purple-bg">📊</span>
+        <span class="action-copy">
+          <strong>Descriptive Assessment Results</strong>
+          <small>Review student assessment scores</small>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <!-- NEW: Help and FAQ -->
+      <a routerLink="/faq" class="action-item">
+        <span class="action-icon purple-bg">?</span>
+        <span class="action-copy">
+          <strong>Help &amp; FAQ</strong>
+          <small>Get help with CollegeJobs ATS</small>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+    </article>
+  </section>
+
+  <section class="workflow-banner">
+    <div class="workflow-mark">✦</div>
+
+    <div class="workflow-copy">
+      <h2>A smarter way to hire</h2>
+      <p>
+        Publish a role, review applications, compare ATS match insights, and
+        move promising candidates to the next stage.
+      </p>
+    </div>
+
+    <a routerLink="/company/applications" class="workflow-link">
+      Explore workflow <span>→</span>
+    </a>
+  </section>
+
+  <p *ngIf="error" class="dashboard-error" role="alert">
+    {{ error }}
+  </p>
+
+  <!-- NEW: Footer FAQ link -->
+  <footer class="company-dashboard-footer">
+    <span>CollegeJobs ATS · Company Portal</span>
+    <a routerLink="/faq">Help &amp; FAQ</a>
+  </footer>
+</div>

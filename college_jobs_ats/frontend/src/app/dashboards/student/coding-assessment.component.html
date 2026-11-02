@@ -1,0 +1,280 @@
+<div class="assessment-shell">
+  <header class="topbar">
+    <a
+      class="brand"
+      routerLink="/student/dashboard"
+      aria-label="CollegeJobs home"
+    >
+      <span class="brand-mark">CJ</span
+      ><span>CollegeJobs <small>ASSESSMENT</small></span>
+    </a>
+    <div class="topbar-right">
+      <span class="live-label"
+        ><span class="live-dot"></span> Assessment in progress</span
+      >
+      <div class="timer" [class.timer-warning]="timeLeftSeconds < 300">
+        <span class="timer-icon">◷</span>{{ timerLabel }}
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <section class="assessment-heading">
+      <div>
+        <div class="eyebrow">
+          TECHNICAL SCREENING <span>•</span> JOB #{{ jobId || "—" }}
+        </div>
+        <h1>{{ jobTitle }}</h1>
+        <p>
+          Show how you think. Write a solution, run the tests, and submit your
+          work for review.
+        </p>
+      </div>
+      <div class="heading-stat">
+        <strong>{{ questions.length }}</strong
+        ><span>Challenges</span>
+      </div>
+    </section>
+
+    <div class="progress-row">
+      <div class="progress-copy">
+        <span
+          >Challenge {{ selectedQuestionIndex + 1 }} of
+          {{ questions.length }}</span
+        ><strong>{{ progressPercent }}% viewed</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <aside class="question-sidebar panel">
+        <div class="sidebar-title">
+          <div>
+            <span class="eyebrow">YOUR ASSESSMENT</span>
+            <h2>Challenges</h2>
+          </div>
+          <span class="count-pill">{{ questions.length }}</span>
+        </div>
+        <button
+          class="question-nav"
+          *ngFor="let question of questions; let i = index"
+          [class.active]="selectedQuestionIndex === i"
+          (click)="selectQuestion(i)"
+          type="button"
+        >
+          <span
+            class="question-number"
+            [class.number-active]="selectedQuestionIndex === i"
+            >{{ (i + 1).toString().padStart(2, "0") }}</span
+          >
+          <span class="question-nav-text"
+            ><strong>{{ question.title }}</strong
+            ><small>{{ question.difficulty }} · 100 pts</small></span
+          >
+          <span class="done-mark" *ngIf="hasRun && selectedQuestionIndex === i"
+            >✓</span
+          >
+        </button>
+        <div class="sidebar-note">
+          <span class="note-icon">✦</span>
+          <div>
+            <strong>Work independently</strong>
+            <p>
+              Write your own solution. Your submission will be saved for the
+              hiring team.
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="challenge-panel panel">
+        <div class="challenge-topline">
+          <div
+            class="difficulty"
+            [class.medium]="currentQuestion.difficulty === 'Medium'"
+            [class.hard]="currentQuestion.difficulty === 'Hard'"
+          >
+            {{ currentQuestion.difficulty }}
+          </div>
+          <span class="points">100 points</span
+          ><span class="challenge-id"
+            >CHALLENGE {{ currentQuestion.id | number: "2.0" }}</span
+          >
+        </div>
+        <h2 class="challenge-title">{{ currentQuestion.title }}</h2>
+        <p class="challenge-description">{{ currentQuestion.description }}</p>
+        <div class="example-grid">
+          <div class="example-card">
+            <span>INPUT</span><code>{{ currentQuestion.input }}</code>
+          </div>
+          <div class="example-card">
+            <span>EXPECTED OUTPUT</span
+            ><code>{{ currentQuestion.output }}</code>
+          </div>
+        </div>
+        <div class="constraints">
+          <span class="constraint-icon">ⓘ</span
+          ><span
+            >Consider edge cases and aim for a clear, efficient solution.</span
+          >
+        </div>
+
+        <div class="editor-header">
+          <div>
+            <span class="editor-symbol">&lt;/&gt;</span
+            ><strong>Code editor</strong
+            ><span class="editor-caption"
+              >Autosaved in this browser session</span
+            >
+          </div>
+          <label class="language-select-label" for="language"
+            >Language
+            <select
+              id="language"
+              [ngModel]="selectedLanguage"
+              (ngModelChange)="changeLanguage($event)"
+            >
+              <option
+                *ngFor="let language of languages"
+                [value]="language.value"
+              >
+                {{ language.label }}
+              </option>
+            </select></label
+          >
+        </div>
+        <div class="editor-wrap">
+          <div class="editor-gutter">
+            <span *ngFor="let line of code.split('\n'); let i = index">{{
+              i + 1
+            }}</span>
+          </div>
+          <textarea
+            aria-label="Write your code here"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            [ngModel]="code"
+            (ngModelChange)="code = $event; onCodeInput()"
+            (paste)="preventPaste($event)"
+            (drop)="preventDrop($event)"
+            placeholder="Write your solution here…"
+          ></textarea>
+        </div>
+        <div class="editor-footer">
+          <span><span class="saved-dot"></span> Changes saved locally</span
+          ><span>{{ code.length }} characters</span>
+        </div>
+
+        <section class="test-results" *ngIf="hasRun || runResults.length">
+          <div class="results-heading">
+            <div>
+              <span class="eyebrow">EXECUTION REPORT</span>
+              <h3>Test results</h3>
+            </div>
+            <span class="results-count"
+              >{{ passedTests }}/{{ runResults.length }} passed</span
+            >
+          </div>
+          <div class="test-row" *ngFor="let result of runResults">
+            <span class="test-state" [class.pass]="result.passed">{{
+              result.passed ? "✓" : "×"
+            }}</span>
+            <div>
+              <strong>{{ result.name }}</strong
+              ><small>{{
+                result.message ||
+                  (result.passed
+                    ? "Output matched expected result"
+                    : "Output did not match expected result")
+              }}</small>
+              <div class="test-detail" *ngIf="!result.passed">
+                <span>Expected: {{ result.expected || "—" }}</span
+                ><span>Actual: {{ result.actual || "—" }}</span>
+              </div>
+            </div>
+            <span class="test-status" [class.pass-text]="result.passed">{{
+              result.passed ? "Passed" : "Failed"
+            }}</span>
+          </div>
+        </section>
+
+        <div
+          class="status-message"
+          *ngIf="statusMessage"
+          [class.status-success]="statusType === 'success'"
+          [class.status-error]="statusType === 'error'"
+          [class.status-info]="statusType === 'info'"
+        >
+          {{ statusMessage }}
+        </div>
+        <div class="submission-card" *ngIf="submissionResult">
+          <span class="submission-check">✓</span>
+          <div>
+            <strong>Submission received</strong>
+            <p>
+              {{
+                submissionResult.message ||
+                  "Your code has been submitted for review."
+              }}
+            </p>
+            <small *ngIf="submissionResult.submission_id"
+              >Submission ID: {{ submissionResult.submission_id }}</small
+            >
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <div class="action-hint">
+            <span>⌘</span> Run your code before submitting
+          </div>
+          <div class="action-buttons">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="runCode()"
+              [disabled]="isRunning || isSubmitting"
+            >
+              <span *ngIf="!isRunning">▶</span
+              ><span *ngIf="isRunning" class="spinner"></span
+              >{{ isRunning ? "Running…" : "Run tests" }}</button
+            ><button
+              type="button"
+              class="btn btn-primary"
+              (click)="submitAssessment()"
+              [disabled]="isSubmitting || isRunning"
+            >
+              <span *ngIf="isSubmitting" class="spinner"></span
+              >{{ isSubmitting ? "Submitting…" : "Submit assessment" }}
+              <span *ngIf="!isSubmitting">→</span>
+            </button>
+          </div>
+        </div>
+        <div class="question-switcher">
+          <button
+            type="button"
+            class="text-button"
+            (click)="selectQuestion(selectedQuestionIndex - 1)"
+            [disabled]="selectedQuestionIndex === 0"
+          >
+            ← Previous challenge</button
+          ><button
+            type="button"
+            class="text-button next-button"
+            (click)="selectQuestion(selectedQuestionIndex + 1)"
+            [disabled]="selectedQuestionIndex === questions.length - 1"
+          >
+            Next challenge →
+          </button>
+        </div>
+      </section>
+    </div>
+    <footer class="page-footer">
+      <span>CollegeJobs ATS <span>·</span> Technical assessment</span
+      ><span>Do not refresh or close this tab until you submit.</span>
+    </footer>
+  </main>
+</div>

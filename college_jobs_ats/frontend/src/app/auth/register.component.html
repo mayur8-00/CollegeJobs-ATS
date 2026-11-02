@@ -1,0 +1,152 @@
+<div class="register-page">
+  <!-- LEFT SIDE -->
+  <div class="register-visual">
+    <div class="visual-orb orb-one"></div>
+    <div class="visual-orb orb-two"></div>
+
+    <div class="visual-content">
+      <div class="brand-line">
+        <!-- <span class="brand-mark">CJ</span> -->
+        <!-- <strong>CollegeJobs</strong> -->
+      </div>
+
+      <span class="eyebrow"> STUDENT • JOBS • CAREERS </span>
+
+      <h1>Start your career journey with CollegeJobs.</h1>
+
+      <p>
+        Create your student account, discover opportunities, apply for jobs and
+        let our built-in ATS help match your resume with the right positions.
+      </p>
+
+      <div class="feature-row">
+        <span>✓ Student Account</span>
+        <span>✓ Job Opportunities</span>
+        <span>✓ Resume ATS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="register-panel">
+    <div class="register-card">
+      <div class="mobile-brand">
+        <span class="brand-mark">CJ</span>
+        <strong>CollegeJobs</strong>
+      </div>
+
+      <span class="eyebrow dark"> GET STARTED </span>
+
+      <h2>Create your student account</h2>
+
+      <p class="subtitle">
+        Register to discover jobs and apply to campus opportunities.
+      </p>
+
+      <form (ngSubmit)="submit()">
+        <!-- NAME -->
+        <label>Full Name</label>
+
+        <div class="input-wrap">
+          <span>👤</span>
+
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="name"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <!-- EMAIL -->
+        <label>Email</label>
+
+        <div class="input-wrap">
+          <span>✉</span>
+
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="student@example.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <!-- PASSWORD -->
+        <label>Password</label>
+
+        <div class="input-wrap">
+          <span>●</span>
+
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            required
+          />
+
+          <button type="button" (click)="showPassword = !showPassword">
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+
+        <!-- CONFIRM PASSWORD -->
+        <label>Confirm Password</label>
+
+        <div class="input-wrap">
+          <span>●</span>
+
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            placeholder="Confirm your password"
+            autocomplete="new-password"
+            required
+          />
+
+          <button
+            type="button"
+            (click)="showConfirmPassword = !showConfirmPassword"
+          >
+            {{ showConfirmPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="success" *ngIf="success">
+          {{ success }}
+        </div>
+
+        <!-- REGISTER -->
+        <button class="register-button" type="submit" [disabled]="loading">
+          <span>
+            {{ loading ? "Creating account…" : "Create Student Account" }}
+          </span>
+
+          <span>
+            {{ loading ? "◌" : "→" }}
+          </span>
+        </button>
+      </form>
+
+      <!-- LOGIN -->
+      <div class="login-link">
+        <span> Already have an account? </span>
+
+        <button type="button" (click)="goToLogin()">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>

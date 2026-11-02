@@ -1,0 +1,242 @@
+<div class="admin-overview">
+  <!-- Welcome header -->
+  <section class="welcome-section">
+    <div class="welcome-copy">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        PLACEMENT OPERATIONS
+      </div>
+
+      <h1>Good to see you, Admin <span class="wave">👋</span></h1>
+      <p>Here's what's happening across your placement platform today.</p>
+
+      <div class="welcome-meta">
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          Platform operational
+        </span>
+        <span class="meta-divider"></span>
+        <span class="meta-text">Admin control center</span>
+      </div>
+    </div>
+
+    <div class="welcome-actions">
+      <button class="btn-secondary" type="button" (click)="refreshDashboard()">
+        <span class="refresh-icon">↻</span> Refresh
+      </button>
+      <button
+        class="btn-primary"
+        type="button"
+        routerLink="/admin/applications"
+      >
+        Review applications <span>→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- KPI cards -->
+  <section class="stats-grid" aria-label="Platform statistics">
+    <article class="stat-card stat-users">
+      <div class="stat-top">
+        <div class="stat-icon">◎</div>
+        <span class="stat-label">PLATFORM</span>
+      </div>
+      <p class="stat-title">Total users</p>
+      <div class="stat-value">{{ totalUsers }}</div>
+      <div class="stat-bottom">
+        <span class="stat-trend">User accounts</span>
+        <span class="stat-arrow">↗</span>
+      </div>
+      <div class="stat-decoration"></div>
+    </article>
+
+    <article class="stat-card stat-students">
+      <div class="stat-top">
+        <div class="stat-icon">♙</div>
+        <span class="stat-label">TALENT</span>
+      </div>
+      <p class="stat-title">Students</p>
+      <div class="stat-value">{{ totalStudents }}</div>
+      <div class="stat-bottom">
+        <span class="stat-trend">Registered candidates</span>
+        <span class="stat-arrow">↗</span>
+      </div>
+      <div class="stat-decoration"></div>
+    </article>
+
+    <article class="stat-card stat-jobs">
+      <div class="stat-top">
+        <div class="stat-icon">✦</div>
+        <span class="stat-label">HIRING</span>
+      </div>
+      <p class="stat-title">Published jobs</p>
+      <div class="stat-value">{{ totalJobs }}</div>
+      <div class="stat-bottom">
+        <span class="stat-trend">Opportunities listed</span>
+        <span class="stat-arrow">↗</span>
+      </div>
+      <div class="stat-decoration"></div>
+    </article>
+
+    <article class="stat-card stat-applications">
+      <div class="stat-top">
+        <div class="stat-icon">✓</div>
+        <span class="stat-label">PIPELINE</span>
+      </div>
+      <p class="stat-title">Applications</p>
+      <div class="stat-value">{{ totalApplications }}</div>
+      <div class="stat-bottom">
+        <span class="stat-trend">Applications received</span>
+        <span class="stat-arrow">↗</span>
+      </div>
+      <div class="stat-decoration"></div>
+    </article>
+  </section>
+
+  <!-- Main dashboard panels -->
+  <section class="overview-grid">
+    <article class="panel workflow-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="panel-kicker">HIRING PROCESS</span>
+          <h2>Placement workflow</h2>
+          <p>Follow the journey from registration to hiring decision.</p>
+        </div>
+        <span class="panel-symbol">↗</span>
+      </div>
+
+      <div class="workflow">
+        <div class="workflow-step">
+          <div class="workflow-number">01</div>
+          <div class="workflow-icon">♙</div>
+          <h3>Registration</h3>
+          <p>Students join the platform</p>
+        </div>
+
+        <div class="workflow-connector"><span></span></div>
+
+        <div class="workflow-step">
+          <div class="workflow-number">02</div>
+          <div class="workflow-icon">▤</div>
+          <h3>Applications</h3>
+          <p>Candidates apply for roles</p>
+        </div>
+
+        <div class="workflow-connector"><span></span></div>
+
+        <div class="workflow-step">
+          <div class="workflow-number">03</div>
+          <div class="workflow-icon">◎</div>
+          <h3>ATS analysis</h3>
+          <p>Resume matching and review</p>
+        </div>
+
+        <div class="workflow-connector"><span></span></div>
+
+        <div class="workflow-step">
+          <div class="workflow-number">04</div>
+          <div class="workflow-icon">✓</div>
+          <h3>Decision</h3>
+          <p>Shortlist and selection</p>
+        </div>
+      </div>
+
+      <div class="workflow-note">
+        <span class="note-icon">i</span>
+        <p>
+          Review ATS match scores and candidate details before making hiring
+          decisions.
+        </p>
+      </div>
+    </article>
+
+    <article class="panel actions-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="panel-kicker">ADMIN TOOLS</span>
+          <h2>Quick actions</h2>
+          <p>Jump directly to platform management.</p>
+        </div>
+      </div>
+
+      <nav class="quick-actions" aria-label="Admin quick actions">
+        <a class="action-link" routerLink="/admin/users">
+          <span class="action-icon users-icon">♙</span>
+          <span class="action-copy">
+            <strong>Manage users</strong>
+            <small>Accounts and access</small>
+          </span>
+          <span class="action-arrow">→</span>
+        </a>
+
+        <a class="action-link" routerLink="/admin/jobs">
+          <span class="action-icon jobs-icon">✦</span>
+          <span class="action-copy">
+            <strong>Review jobs</strong>
+            <small>Published opportunities</small>
+          </span>
+          <span class="action-arrow">→</span>
+        </a>
+
+        <a class="action-link" routerLink="/admin/applications">
+          <span class="action-icon applications-icon">✓</span>
+          <span class="action-copy">
+            <strong>Review applications</strong>
+            <small>Candidate pipeline</small>
+          </span>
+          <span class="action-arrow">→</span>
+        </a>
+      </nav>
+    </article>
+  </section>
+
+  <!-- Footer information -->
+  <section class="bottom-grid">
+    <article class="panel insight-panel">
+      <div class="insight-icon">✧</div>
+      <div class="insight-content">
+        <span class="panel-kicker">ADMIN INSIGHT</span>
+        <h2>Keep your hiring pipeline moving</h2>
+        <p>
+          Review incoming applications regularly, verify resume-analysis
+          results, and keep job listings accurate to give candidates a better
+          experience.
+        </p>
+        <a routerLink="/admin/applications" class="text-link">
+          Open application management <span>→</span>
+        </a>
+      </div>
+    </article>
+
+    <article class="panel platform-panel">
+      <div class="platform-heading">
+        <div>
+          <span class="panel-kicker">PLATFORM OVERVIEW</span>
+          <h2>System architecture</h2>
+        </div>
+        <span class="architecture-icon">⌘</span>
+      </div>
+
+      <div class="service-row">
+        <span class="service-indicator"></span>
+        <span>Angular frontend</span>
+        <span class="service-type">UI</span>
+      </div>
+      <div class="service-row">
+        <span class="service-indicator"></span>
+        <span>FastAPI backend</span>
+        <span class="service-type">API</span>
+      </div>
+      <div class="service-row">
+        <span class="service-indicator"></span>
+        <span>MySQL database</span>
+        <span class="service-type">DATA</span>
+      </div>
+
+      <p class="platform-disclaimer">
+        These labels describe your configured architecture; they are not live
+        health checks.
+      </p>
+    </article>
+  </section>
+</div>

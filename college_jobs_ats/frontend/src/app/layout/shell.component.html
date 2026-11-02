@@ -1,0 +1,94 @@
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside
+    class="sidebar"
+    id="app-sidebar"
+    [class.open]="mobileOpen"
+    aria-label="Main navigation"
+    [attr.aria-hidden]="isMobile && !mobileOpen ? 'true' : null"
+  >
+    <div class="brand">
+      <div>
+        <strong>Placement &amp; ATS</strong>
+      </div>
+    </div>
+
+    <!-- USER PROFILE -->
+    <div class="profile-mini">
+      <div class="avatar">
+        {{ name.charAt(0).toUpperCase() }}
+      </div>
+
+      <div class="profile-copy">
+        <strong>{{ name }}</strong>
+        <span>{{ roleLabel }}</span>
+      </div>
+    </div>
+
+    <!-- ROLE-BASED NAVIGATION -->
+    <nav aria-label="Dashboard navigation">
+      <a
+        *ngFor="let item of menu"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        <span class="nav-icon" aria-hidden="true">
+          {{ item.icon }}
+        </span>
+
+        <span>{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <!-- SIDEBAR FOOTER -->
+    <div class="sidebar-footer">
+      <div class="secure">● Secure session</div>
+
+      <button type="button" class="logout" (click)="logout()">
+        <span aria-hidden="true">↪</span>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MOBILE BACKDROP -->
+  <div
+    class="backdrop"
+    *ngIf="mobileOpen && isMobile"
+    (click)="closeMenu()"
+    aria-hidden="true"
+  ></div>
+
+  <!-- MAIN AREA -->
+  <main class="main">
+    <header class="topbar">
+      <!-- MOBILE MENU BUTTON -->
+      <button
+        type="button"
+        class="menu-toggle"
+        (click)="toggleMenu()"
+        [attr.aria-expanded]="mobileOpen"
+        aria-controls="app-sidebar"
+        aria-label="Toggle navigation menu"
+      >
+        <span aria-hidden="true">
+          {{ mobileOpen ? "✕" : "☰" }}
+        </span>
+      </button>
+
+      <div>
+        <strong>{{ roleLabel }} workspace</strong>
+      </div>
+
+      <div class="topbar-badge">● Live</div>
+    </header>
+    
+
+    <!-- ROUTER CONTENT -->
+    <section class="content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

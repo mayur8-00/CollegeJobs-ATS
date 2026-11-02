@@ -1,0 +1,118 @@
+<main class="details-page">
+  <a class="back-link" routerLink="/admin/jobs">
+    <span aria-hidden="true">←</span> Back to jobs
+  </a>
+
+  <section *ngIf="loading" class="state-card" aria-live="polite">
+    <div class="loader"></div>
+    <h2>Loading job details...</h2>
+    <p>Please wait while we retrieve the job information.</p>
+  </section>
+
+  <section *ngIf="!loading && error" class="state-card error-card">
+    <div class="state-icon">!</div>
+    <h2>Unable to display this job</h2>
+    <p>{{ error }}</p>
+    <a class="primary-button" routerLink="/admin/jobs">Return to jobs</a>
+  </section>
+
+  <ng-container *ngIf="!loading && job">
+    <header class="details-hero">
+      <div class="hero-topline">
+        <span class="eyebrow">PLACEMENT & ATS · JOB DETAILS</span>
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          {{ job.status || "Available" }}
+        </span>
+      </div>
+
+      <div class="hero-content">
+        <div class="company-mark">CJ</div>
+        <div>
+          <h1>{{ job.title || "Untitled position" }}</h1>
+          <p class="company-name">
+            {{ job.company_name || job.company?.name || "Hiring company" }}
+          </p>
+        </div>
+      </div>
+
+      <p class="description">
+        {{ job.description || "No job description has been provided." }}
+      </p>
+
+      <div class="metadata">
+        <span>📍 {{ job.location || "Location not specified" }}</span>
+        <span
+          >💼
+          {{
+            job.job_type ||
+              job.employment_type ||
+              "Employment type not specified"
+          }}</span
+        >
+        <span>💰 {{ job.salary || "Salary not specified" }}</span>
+      </div>
+    </header>
+
+    <div class="details-grid">
+      <section class="content-card">
+        <span class="section-label">ROLE OVERVIEW</span>
+        <h2>About this opportunity</h2>
+        <p class="body-copy">
+          {{
+            job.description || "No additional role information is available."
+          }}
+        </p>
+
+        <div class="section-divider"></div>
+
+        <h2>Required skills</h2>
+        <div class="skill-list" *ngIf="skills.length; else noSkills">
+          <span class="skill-chip" *ngFor="let skill of skills">
+            {{ skill }}
+          </span>
+        </div>
+
+        <ng-template #noSkills>
+          <p class="body-copy">No specific skills have been listed.</p>
+        </ng-template>
+      </section>
+
+      <aside class="content-card summary-card">
+        <span class="section-label">POSITION SUMMARY</span>
+        <h2>Job information</h2>
+
+        <div class="summary-row">
+          <span>Job ID</span>
+          <strong>#{{ job.id }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Location</span>
+          <strong>{{ job.location || "Not specified" }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Employment</span>
+          <strong>{{
+            job.job_type || job.employment_type || "Not specified"
+          }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Salary</span>
+          <strong>{{ job.salary || "Not specified" }}</strong>
+        </div>
+
+        <div class="summary-note">
+          <span aria-hidden="true">✦</span>
+          Review the role information before managing this position.
+        </div>
+
+        <a class="primary-button full-width" routerLink="/admin/jobs">
+          Back to all jobs <span aria-hidden="true">→</span>
+        </a>
+      </aside>
+    </div>
+  </ng-container>
+</main>

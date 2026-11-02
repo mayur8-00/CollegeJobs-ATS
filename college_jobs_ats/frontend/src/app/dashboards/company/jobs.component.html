@@ -1,0 +1,310 @@
+<div class="jobs-page">
+  <header class="page-header">
+    <div class="heading">
+      <div class="heading-icon">✦</div>
+      <div>
+        <span class="eyebrow">TALENT MANAGEMENT</span>
+        <h1>Manage your jobs</h1>
+        <p>Create opportunities and find the right talent for your team.</p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="primary-button header-button"
+      (click)="showForm = !showForm"
+    >
+      <span>{{ showForm ? "−" : "+" }}</span>
+      {{ showForm ? "Hide form" : "Create job" }}
+    </button>
+  </header>
+
+  <div
+    *ngIf="notice"
+    class="notice"
+    [class.notice-error]="noticeType === 'error'"
+    role="status"
+  >
+    <span>{{ noticeType === "success" ? "✓" : "!" }}</span>
+    {{ notice }}
+    <button
+      type="button"
+      aria-label="Dismiss notification"
+      (click)="notice = ''"
+    >
+      ×
+    </button>
+  </div>
+
+  <section class="stats-grid">
+    <article class="stat-card">
+      <div class="stat-icon blue">▣</div>
+      <div>
+        <span>Total openings</span>
+        <strong>{{ totalJobs }}</strong>
+        <small>Jobs in your workspace</small>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon violet">✧</div>
+      <div>
+        <span>Skills requested</span>
+        <strong>{{ totalSkills }}</strong>
+        <small>Across your job listings</small>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon green">✓</div>
+      <div>
+        <span>Workspace status</span>
+        <strong class="status-value">Connected</strong>
+        <small>Ready to manage openings</small>
+      </div>
+    </article>
+  </section>
+
+  <section class="form-card" *ngIf="showForm">
+    <div class="section-heading">
+      <div class="section-icon">＋</div>
+      <div>
+        <h2>Create a new opportunity</h2>
+        <p>Share the role details with potential candidates.</p>
+      </div>
+    </div>
+
+    <form (ngSubmit)="createJob()" #jobForm="ngForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="title">Job title <span>*</span></label>
+          <input
+            id="title"
+            name="title"
+            [(ngModel)]="form.title"
+            required
+            maxlength="150"
+            placeholder="e.g. Python Backend Developer"
+          />
+        </div>
+
+        <div class="field">
+          <label for="location">Location <span>*</span></label>
+          <input
+            id="location"
+            name="location"
+            [(ngModel)]="form.location"
+            required
+            maxlength="150"
+            placeholder="e.g. Pune, India"
+          />
+        </div>
+
+        <div class="field full-width">
+          <div class="label-row">
+            <label for="description">Job description <span>*</span></label>
+            <small>{{ form.description.length }}/5000</small>
+          </div>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="form.description"
+            required
+            maxlength="5000"
+            rows="5"
+            placeholder="Describe responsibilities, required experience, and what makes this opportunity great..."
+          ></textarea>
+        </div>
+
+        <div class="field full-width">
+          <label for="skills">Required skills</label>
+
+          <div class="skill-input">
+            <span class="skill-tag" *ngFor="let skill of skills">
+              {{ skill }}
+              <button
+                type="button"
+                [attr.aria-label]="'Remove ' + skill"
+                (click)="removeSkill(skill)"
+              >
+                ×
+              </button>
+            </span>
+
+            <input
+              id="skills"
+              name="skillInput"
+              [(ngModel)]="skillInput"
+              (keydown)="onSkillKeydown($event)"
+              placeholder="Type a skill and press Enter"
+            />
+
+            <button type="button" class="add-skill-button" (click)="addSkill()">
+              Add
+            </button>
+          </div>
+
+          <small class="field-hint">
+            Add skills such as Python, Django, FastAPI, SQL, or Angular.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="salary">Salary / compensation</label>
+          <input
+            id="salary"
+            name="salary"
+            [(ngModel)]="form.salary"
+            maxlength="100"
+            placeholder="e.g. ₹4–8 LPA or Negotiable"
+          />
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <p><span>*</span> Required fields</p>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="secondary-button"
+            [disabled]="submitting"
+            (click)="resetForm()"
+          >
+            Clear form
+          </button>
+
+          <button
+            type="submit"
+            class="primary-button"
+            [disabled]="submitting || !jobForm.valid"
+          >
+            <span *ngIf="!submitting">✦ &nbsp; Publish job</span>
+            <span *ngIf="submitting" class="loading-label">
+              <span class="spinner"></span> Publishing...
+            </span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section class="openings-section">
+    <div class="openings-header">
+      <div>
+        <span class="eyebrow">YOUR RECRUITMENT</span>
+        <h2>
+          Your openings <span class="count">{{ filteredJobs.length }}</span>
+        </h2>
+        <p>Search, review, and manage the jobs your company has published.</p>
+      </div>
+
+      <button
+        type="button"
+        class="secondary-button refresh-button"
+        [disabled]="loading"
+        (click)="loadJobs()"
+      >
+        ↻ Refresh
+      </button>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <span>⌕</span>
+        <input
+          name="searchTerm"
+          [(ngModel)]="searchTerm"
+          placeholder="Search job title, skills, or location..."
+        />
+        <button
+          *ngIf="searchTerm"
+          type="button"
+          aria-label="Clear search"
+          (click)="searchTerm = ''"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <span class="spinner"></span>
+      <p>Loading your job openings...</p>
+    </div>
+
+    <div *ngIf="!loading && filteredJobs.length" class="job-grid">
+      <article
+        class="job-card"
+        *ngFor="let job of filteredJobs; trackBy: trackByJobId"
+      >
+        <div class="job-card-top">
+          <div class="job-avatar">{{ job.title.charAt(0).toUpperCase() }}</div>
+          <span class="job-status"><span></span> Listed</span>
+        </div>
+
+        <h3>{{ job.title }}</h3>
+        <p class="job-description">{{ job.description }}</p>
+
+        <div class="job-meta">
+          <span>⌖ {{ job.location || "Location not specified" }}</span>
+          <span *ngIf="job.salary">₹ {{ job.salary }}</span>
+        </div>
+
+        <div class="job-skills" *ngIf="skillsArray(job.skills).length">
+          <span *ngFor="let skill of skillsArray(job.skills).slice(0, 5)">
+            {{ skill }}
+          </span>
+          <span *ngIf="skillsArray(job.skills).length > 5">
+            +{{ skillsArray(job.skills).length - 5 }}
+          </span>
+        </div>
+
+        <div class="job-card-footer">
+          <span class="job-id">JOB #{{ job.id }}</span>
+
+          <button
+            type="button"
+            class="delete-button"
+            [disabled]="deletingId === job.id"
+            (click)="deleteJob(job)"
+          >
+            {{ deletingId === job.id ? "Deleting..." : "Delete job" }}
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading && !filteredJobs.length" class="empty-state">
+      <div class="empty-icon">▣</div>
+      <h3>
+        {{
+          searchTerm ? "No matching jobs" : "Your next great hire starts here"
+        }}
+      </h3>
+      <p>
+        {{
+          searchTerm
+            ? "Try another keyword or clear your search."
+            : "Create your first job opening to start attracting candidates."
+        }}
+      </p>
+      <button
+        *ngIf="searchTerm"
+        type="button"
+        class="secondary-button"
+        (click)="searchTerm = ''"
+      >
+        Clear search
+      </button>
+      <button
+        *ngIf="!searchTerm"
+        type="button"
+        class="primary-button"
+        (click)="showForm = true"
+      >
+        ＋ Create your first job
+      </button>
+    </div>
+  </section>
+</div>

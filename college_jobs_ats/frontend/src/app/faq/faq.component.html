@@ -1,0 +1,165 @@
+<div class="faq-page">
+  <section class="faq-hero">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
+
+    <div class="hero-content">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        COLLEGEJOBS SUPPORT CENTER
+      </div>
+
+      <h1>
+        Questions?
+        <span>We've got answers.</span>
+      </h1>
+
+      <p class="hero-description">
+        Everything you need to know about finding jobs, managing applications,
+        resume analysis, and coding assessments.
+      </p>
+
+      <div class="search-box">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+
+        <input
+          type="search"
+          [(ngModel)]="searchText"
+          aria-label="Search frequently asked questions"
+          placeholder="Search for answers..."
+        />
+
+        <button
+          *ngIf="searchText"
+          type="button"
+          class="clear-search"
+          aria-label="Clear search"
+          (click)="clearSearch()"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="hero-meta">
+        <span>✓ Quick answers</span>
+        <span>✓ Easy navigation</span>
+        <span>✓ Student & company support</span>
+      </div>
+    </div>
+
+    <div class="hero-decoration" aria-hidden="true">
+      <div class="floating-card floating-card-main">
+        <div class="floating-icon">✦</div>
+        <div>
+          <strong>Find your answer</strong>
+          <span>Help, made simple.</span>
+        </div>
+      </div>
+
+      <div class="floating-card floating-card-small">
+        <span class="status-dot"></span>
+        Smart support
+      </div>
+
+      <div class="orbit orbit-one"></div>
+      <div class="orbit orbit-two"></div>
+    </div>
+  </section>
+
+  <section class="faq-content">
+    <div class="section-heading">
+      <div>
+        <span class="section-label">HELP CENTER</span>
+        <h2>How can we help?</h2>
+        <p>Choose a topic or search for a specific question.</p>
+      </div>
+
+      <div class="result-count">
+        <strong>{{ filteredFaqs.length }}</strong>
+        <span>questions found</span>
+      </div>
+    </div>
+
+    <nav class="category-list" aria-label="FAQ categories">
+      <button
+        *ngFor="let category of categories"
+        type="button"
+        class="category-button"
+        [class.active]="selectedCategory === category"
+        [attr.aria-pressed]="selectedCategory === category"
+        (click)="selectCategory(category)"
+      >
+        <span>{{ category }}</span>
+        <span class="category-count">{{ getCategoryCount(category) }}</span>
+      </button>
+    </nav>
+
+    <div class="faq-list" *ngIf="filteredFaqs.length; else noResults">
+      <article
+        class="faq-item"
+        *ngFor="let faq of filteredFaqs; trackBy: trackFaq"
+        [class.expanded]="isOpen(faq)"
+      >
+        <button
+          type="button"
+          class="faq-question"
+          [attr.aria-expanded]="isOpen(faq)"
+          (click)="toggleFaq(faq)"
+        >
+          <span class="question-icon">{{ faq.icon }}</span>
+
+          <span class="question-content">
+            <span class="question-category">{{ faq.category }}</span>
+            <span class="question-title">{{ faq.question }}</span>
+          </span>
+
+          <span class="expand-icon" aria-hidden="true">
+            {{ isOpen(faq) ? "−" : "+" }}
+          </span>
+        </button>
+
+        <div class="answer-wrapper" [class.answer-open]="isOpen(faq)">
+          <div class="answer-inner">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #noResults>
+      <div class="empty-state">
+        <div class="empty-icon">⌕</div>
+        <h3>No answers found</h3>
+        <p>Try another search term or select a different category.</p>
+        <button type="button" class="reset-button" (click)="clearSearch()">
+          Show all questions
+        </button>
+      </div>
+    </ng-template>
+
+    <section class="support-banner">
+      <div class="support-icon">✉</div>
+
+      <div class="support-copy">
+        <span class="section-label">STILL NEED HELP?</span>
+        <h2>Can't find your answer?</h2>
+        <p>
+          Get in touch with your portal administrator for help with your
+          account, applications, or technical issues.
+        </p>
+      </div>
+
+      <a class="support-button" href="mailto:support@collegejobs.example">
+        Contact support <span aria-hidden="true">↗</span>
+      </a>
+    </section>
+  </section>
+
+  <footer class="faq-footer">
+    <span class="footer-brand">
+      <span class="footer-logo">CJ</span>
+      CollegeJobs ATS
+    </span>
+    <span>Helping students move forward in their careers.</span>
+  </footer>
+</div>

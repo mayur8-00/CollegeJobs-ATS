@@ -1,0 +1,238 @@
+<main class="assessment-page">
+  <!-- Job ID entry screen -->
+  <section *ngIf="!jobId" class="job-id-card">
+    <a routerLink="/student/jobs" class="back-link-light">
+      ← Back to Find Jobs
+    </a>
+
+    <div class="job-id-icon" aria-hidden="true">📝</div>
+
+    <span class="form-eyebrow">STUDENT ASSESSMENT</span>
+
+    <h1>Ready to test your skills?</h1>
+
+    <p class="job-id-description">
+      Enter the job ID from the job posting to open your assessment and
+      demonstrate your skills to the employer.
+    </p>
+
+    <form (ngSubmit)="openAssessment()" autocomplete="off">
+      <label for="jobId">Job ID</label>
+
+      <input
+        id="jobId"
+        name="jobId"
+        type="text"
+        [(ngModel)]="jobIdInput"
+        (input)="jobIdError = ''"
+        placeholder="Enter your job ID"
+        autocomplete="off"
+        required
+        aria-describedby="jobIdHelp jobIdError"
+      />
+
+      <p *ngIf="jobIdError" id="jobIdError" class="job-id-error" role="alert">
+        {{ jobIdError }}
+      </p>
+
+      <button type="submit" class="open-assessment-btn">
+        Open Assessment
+        <span aria-hidden="true">→</span>
+      </button>
+    </form>
+
+    <div class="job-id-help" id="jobIdHelp">
+      <span aria-hidden="true">ⓘ</span>
+      You can find the job ID in the job details or job posting.
+    </div>
+
+    <div class="job-id-footer">
+      <span aria-hidden="true">🔒</span>
+      Your assessment is linked to the selected job.
+    </div>
+  </section>
+
+  <!-- Assessment screen -->
+  <ng-container *ngIf="jobId">
+    <header class="hero">
+      <button type="button" class="back-link" (click)="goBack()">
+        ← Back to jobs
+      </button>
+
+      <span class="eyebrow">SKILLS ASSESSMENT</span>
+
+      <h1>{{ jobTitle }}</h1>
+
+      <p>
+        Answer all {{ questions.length }} descriptive questions. Each question
+        is worth 5 marks.
+      </p>
+
+      <div
+        class="progress"
+        role="progressbar"
+        [attr.aria-valuenow]="answeredCount"
+        aria-valuemin="0"
+        [attr.aria-valuemax]="questions.length"
+        [attr.aria-valuetext]="
+          answeredCount + ' of ' + questions.length + ' answered'
+        "
+      >
+        <span [style.width.%]="progress"></span>
+      </div>
+
+      <div class="progress-details">
+        <small>{{ answeredCount }} of {{ questions.length }} answered</small>
+        <small>{{ totalMarks }} marks total</small>
+      </div>
+    </header>
+
+    <div *ngIf="loadingJob" class="notice loading" role="status">
+      <span class="loading-spinner" aria-hidden="true"></span>
+      Loading job details...
+    </div>
+
+    <div *ngIf="errorMessage" class="notice error" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="pasteMessage" class="notice paste-notice" role="status">
+      {{ pasteMessage }}
+    </div>
+
+    <form
+      *ngIf="!loadingJob && !result"
+      (ngSubmit)="submitAssessment()"
+      autocomplete="off"
+    >
+      <article class="question" *ngFor="let q of questions; let i = index">
+        <div class="qtop">
+          <span>QUESTION {{ i + 1 }} · {{ q.category }}</span>
+          <b>{{ q.marks }} marks</b>
+        </div>
+
+        <h2>{{ q.question }}</h2>
+
+        <label class="visually-hidden" [for]="'answer-' + q.id">
+          Answer for question {{ i + 1 }}
+        </label>
+
+        <textarea
+          [(ngModel)]="answers[q.id]"
+          (ngModelChange)="updateProgress()"
+          [name]="'answer-' + q.id"
+          [id]="'answer-' + q.id"
+          rows="6"
+          maxlength="10000"
+          required
+          spellcheck="true"
+          autocomplete="off"
+          placeholder="Write your answer here. Include an example where possible..."
+          [disabled]="submitting || submitted"
+          [attr.aria-label]="'Answer for question ' + (i + 1)"
+          (paste)="preventPaste($event)"
+          (drop)="preventDrop($event)"
+          (keydown)="preventPasteShortcut($event)"
+          (focus)="clearPasteMessage()"
+        ></textarea>
+
+        <div class="answer-meta">
+          <small>{{ (answers[q.id] || "").length }} / 10000 characters</small>
+
+          <small [class.complete]="(answers[q.id] || '').trim().length > 0">
+            {{
+              (answers[q.id] || "").trim().length > 0
+                ? "✓ Answer started"
+                : "Not answered"
+            }}
+          </small>
+        </div>
+      </article>
+
+      <section class="submitbar">
+        <div class="submit-copy">
+          <h3>Ready to submit?</h3>
+
+          <p>
+            Review your answers before submitting. You cannot edit your answers
+            after a successful submission.
+          </p>
+
+          <p class="muted">
+            Your descriptive answers will be available for company review. Any
+            automated score is provisional.
+          </p>
+
+          <p *ngIf="!allAnswered" class="incomplete-message">
+            Answer all {{ questions.length }} questions to enable submission.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting || submitted || !allAnswered"
+        >
+          {{
+            submitting
+              ? "Submitting assessment..."
+              : submitted
+                ? "Assessment submitted"
+                : "Submit assessment"
+          }}
+        </button>
+      </section>
+
+      <div *ngIf="submitError" class="notice error" role="alert">
+        {{ submitError }}
+
+        <button
+          *ngIf="!submitted"
+          type="button"
+          class="retry-button"
+          (click)="submitAssessment()"
+          [disabled]="submitting"
+        >
+          Try again
+        </button>
+      </div>
+    </form>
+
+    <!-- Submission result -->
+    <section *ngIf="result" class="result" aria-live="polite">
+      <div class="result-icon" aria-hidden="true">✓</div>
+
+      <span class="eyebrow result-eyebrow">SUBMISSION COMPLETE</span>
+
+      <h2>Assessment submitted successfully!</h2>
+
+      <p>{{ successMessage }}</p>
+
+      <div class="score">
+        <strong>{{ result.provisional_score }}</strong>
+        <span>/ {{ result.max_score }} provisional marks</span>
+      </div>
+
+      <div class="review-status">
+        <span class="status-dot"></span>
+        {{
+          result.review_status === "pending_review"
+            ? "Pending company review"
+            : result.review_status.replaceAll("_", " ")
+        }}
+      </div>
+
+      <p class="muted">
+        Your provisional score is based on the backend response. The employer
+        should review your written answers before making a hiring decision.
+      </p>
+
+      <div class="result-actions">
+        <a routerLink="/student/applications" class="primary-link">
+          View my applications
+        </a>
+
+        <a routerLink="/student/jobs" class="secondary-link"> Back to jobs </a>
+      </div>
+    </section>
+  </ng-container>
+</main>

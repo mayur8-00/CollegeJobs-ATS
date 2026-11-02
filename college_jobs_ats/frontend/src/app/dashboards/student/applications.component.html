@@ -1,0 +1,782 @@
+<div class="applications-page">
+  <!-- =========================================================
+       HERO
+  ========================================================== -->
+  <section class="hero-section">
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        APPLICATION CENTER
+      </div>
+
+      <h1>
+        My Applications
+        <span class="hero-gradient">.</span>
+      </h1>
+
+      <p>
+        Track your applications, ATS performance and hiring progress from one
+        place.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="refresh()"
+      [disabled]="loading"
+    >
+      <span class="refresh-icon" [class.spinning]="loading">↻</span>
+      Refresh
+    </button>
+  </section>
+
+  <!-- =========================================================
+       KPI CARDS
+  ========================================================== -->
+  <section class="stats-grid">
+    <button
+      type="button"
+      class="stat-card stat-all"
+      [class.active]="selectedStatus === 'all'"
+      (click)="setStatus('all')"
+    >
+      <div class="stat-icon">
+        <span>▣</span>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">Total Applications</span>
+        <strong>{{ totalApplications }}</strong>
+        <small>All submitted applications</small>
+      </div>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card stat-review"
+      [class.active]="selectedStatus === 'reviewing'"
+      (click)="setStatus('reviewing')"
+    >
+      <div class="stat-icon">
+        <span>◷</span>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">Under Review</span>
+        <strong>{{ reviewingCount }}</strong>
+        <small>Being reviewed by recruiters</small>
+      </div>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card stat-shortlisted"
+      [class.active]="selectedStatus === 'shortlisted'"
+      (click)="setStatus('shortlisted')"
+    >
+      <div class="stat-icon">
+        <span>★</span>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">Shortlisted</span>
+        <strong>{{ shortlistedCount }}</strong>
+        <small>Applications moving forward</small>
+      </div>
+    </button>
+
+    <button
+      type="button"
+      class="stat-card stat-selected"
+      [class.active]="selectedStatus === 'selected'"
+      (click)="setStatus('selected')"
+    >
+      <div class="stat-icon">
+        <span>✓</span>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">Selected</span>
+        <strong>{{ selectedCount }}</strong>
+        <small>Successful applications</small>
+      </div>
+    </button>
+
+    <div class="stat-card stat-score">
+      <div class="stat-icon">
+        <span>AI</span>
+      </div>
+
+      <div class="stat-content">
+        <span class="stat-label">Average ATS</span>
+        <strong>{{ averageScore }}%</strong>
+        <small>Resume compatibility score</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SEARCH / FILTER BAR
+  ========================================================== -->
+  <section class="control-panel">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="applyFilters()"
+        placeholder="Search by job, application ID, resume or status..."
+      />
+
+      <button
+        *ngIf="searchText"
+        type="button"
+        class="clear-search"
+        (click)="searchText = ''; applyFilters()"
+        aria-label="Clear search"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'all'"
+        (click)="setStatus('all')"
+      >
+        All
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'applied'"
+        (click)="setStatus('applied')"
+      >
+        Applied
+        <span>{{ appliedCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'reviewing'"
+        (click)="setStatus('reviewing')"
+      >
+        Review
+        <span>{{ reviewingCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'shortlisted'"
+        (click)="setStatus('shortlisted')"
+      >
+        Shortlisted
+        <span>{{ shortlistedCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'selected'"
+        (click)="setStatus('selected')"
+      >
+        Selected
+        <span>{{ selectedCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-button"
+        [class.active]="selectedStatus === 'rejected'"
+        (click)="setStatus('rejected')"
+      >
+        Rejected
+        <span>{{ rejectedCount }}</span>
+      </button>
+    </div>
+
+    <button
+      *ngIf="searchText || selectedStatus !== 'all'"
+      type="button"
+      class="reset-button"
+      (click)="clearFilters()"
+    >
+      Reset filters
+    </button>
+  </section>
+
+  <!-- =========================================================
+       ERROR
+  ========================================================== -->
+  <div class="error-box" *ngIf="error">
+    <div class="error-icon">!</div>
+
+    <div>
+      <strong>Something went wrong</strong>
+      <p>{{ error }}</p>
+    </div>
+
+    <button type="button" (click)="refresh()">Try again</button>
+  </div>
+
+  <!-- =========================================================
+       LOADING
+  ========================================================== -->
+  <section class="loading-state" *ngIf="loading">
+    <div class="loading-orb"></div>
+
+    <div class="loading-content">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line short"></div>
+    </div>
+
+    <div class="skeleton-card-grid">
+      <div class="skeleton-application" *ngFor="let item of [1, 2, 3]">
+        <div class="skeleton skeleton-small"></div>
+        <div class="skeleton skeleton-heading"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       EMPTY - NO APPLICATIONS
+  ========================================================== -->
+  <section class="empty-state" *ngIf="!loading && !hasApplications && !error">
+    <div class="empty-illustration">
+      <div class="empty-circle">
+        <span>↗</span>
+      </div>
+    </div>
+
+    <h2>No applications yet</h2>
+
+    <p>
+      Once you apply for a job, your application and ATS analysis will appear
+      here.
+    </p>
+
+    <a routerLink="/student/jobs" class="browse-jobs-button">
+      <span>Explore Jobs</span>
+      <span>→</span>
+    </a>
+  </section>
+
+  <!-- =========================================================
+       FILTERED EMPTY
+  ========================================================== -->
+  <section
+    class="empty-state compact"
+    *ngIf="!loading && hasApplications && !hasFilteredResults && !error"
+  >
+    <div class="empty-filter-icon">⌕</div>
+
+    <h2>No matching applications</h2>
+
+    <p>Try another search term or clear the current filters.</p>
+
+    <button type="button" class="browse-jobs-button" (click)="clearFilters()">
+      Clear Filters
+    </button>
+  </section>
+
+  <!-- =========================================================
+       APPLICATION LIST
+  ========================================================== -->
+  <section class="applications-list" *ngIf="!loading && hasFilteredResults">
+    <div class="list-heading">
+      <div>
+        <span class="section-label">YOUR CAREER PIPELINE</span>
+
+        <h2>
+          {{ filteredApplications.length }}
+          <span
+            >application{{ filteredApplications.length === 1 ? "" : "s" }}</span
+          >
+        </h2>
+      </div>
+
+      <div class="pipeline-mini">
+        <div class="pipeline-step" [class.done]="totalApplications > 0">
+          <span></span>
+          Applied
+        </div>
+
+        <div
+          class="pipeline-line"
+          [class.done]="reviewingCount + shortlistedCount + selectedCount > 0"
+        ></div>
+
+        <div
+          class="pipeline-step"
+          [class.done]="reviewingCount + shortlistedCount + selectedCount > 0"
+        >
+          <span></span>
+          Review
+        </div>
+
+        <div
+          class="pipeline-line"
+          [class.done]="shortlistedCount + selectedCount > 0"
+        ></div>
+
+        <div
+          class="pipeline-step"
+          [class.done]="shortlistedCount + selectedCount > 0"
+        >
+          <span></span>
+          Shortlist
+        </div>
+
+        <div class="pipeline-line" [class.done]="selectedCount > 0"></div>
+
+        <div class="pipeline-step" [class.done]="selectedCount > 0">
+          <span></span>
+          Selected
+        </div>
+      </div>
+    </div>
+
+    <!-- APPLICATION CARD -->
+    <article
+      class="application-card"
+      *ngFor="let app of filteredApplications; trackBy: trackByApplication"
+      [class.is-selected]="selectedApplication?.id === app.id"
+    >
+      <!-- TOP -->
+      <div class="application-top">
+        <div class="application-number">
+          <span>APPLICATION</span>
+          <strong>#{{ app.id }}</strong>
+        </div>
+
+        <div class="status-badge" [ngClass]="getStatusClass(app)">
+          <span class="status-dot"></span>
+          {{ getStatusLabel(app) }}
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="application-main">
+        <div class="job-information">
+          <div class="job-icon">
+            {{ getJobTitle(app).charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="job-copy">
+            <span class="job-label">POSITION</span>
+
+            <h3>
+              {{ getJobTitle(app) }}
+            </h3>
+
+            <div class="job-meta">
+              <span>
+                <b>Job ID</b>
+                #{{ app.job_id }}
+              </span>
+
+              <span class="meta-divider"></span>
+
+              <span>
+                {{ getRelativeDate(app) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ATS SCORE -->
+        <div class="ats-score-box">
+          <div
+            class="score-ring"
+            [ngClass]="getScoreClass(getScore(app))"
+            [style.--score]="getScore(app)"
+          >
+            <div class="score-ring-inner">
+              <strong>{{ getScore(app) }}%</strong>
+              <span>ATS</span>
+            </div>
+          </div>
+
+          <div class="score-copy">
+            <strong>{{ getScoreLabel(app) }}</strong>
+            <span>Resume compatibility</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATS BREAKDOWN -->
+      <div class="ats-breakdown">
+        <div class="breakdown-heading">
+          <div>
+            <span class="section-label">AI RESUME ANALYSIS</span>
+            <h4>ATS Performance</h4>
+          </div>
+
+          <span class="ai-pill">
+            <span>✦</span>
+            AI Powered
+          </span>
+        </div>
+
+        <div class="score-bars">
+          <!-- Skills -->
+          <div class="score-bar-item">
+            <div class="bar-label">
+              <span>Skills Match</span>
+              <strong>{{ getSkillScore(app) }}%</strong>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-value skills-progress"
+                [style.width.%]="getSkillScore(app)"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="score-bar-item">
+            <div class="bar-label">
+              <span>Education</span>
+              <strong>{{ getEducationScore(app) }}%</strong>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-value education-progress"
+                [style.width.%]="getEducationScore(app)"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Experience -->
+          <div class="score-bar-item">
+            <div class="bar-label">
+              <span>Experience</span>
+              <strong>{{ getExperienceScore(app) }}%</strong>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-value experience-progress"
+                [style.width.%]="getExperienceScore(app)"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECOMMENDATION -->
+        <div class="recommendation-row">
+          <span class="recommendation-label"> ATS Recommendation </span>
+
+          <span
+            class="recommendation-badge"
+            [ngClass]="getRecommendationClass(app)"
+          >
+            {{ getRecommendation(app) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="skills-section">
+        <div class="skills-column">
+          <div class="skills-title matched-title">
+            <span>✓</span>
+            Matched Skills
+          </div>
+
+          <div class="skill-list" *ngIf="getMatchedSkills(app).length > 0">
+            <span
+              class="skill-chip matched"
+              *ngFor="let skill of getMatchedSkills(app)"
+            >
+              {{ skill }}
+            </span>
+          </div>
+
+          <span class="no-skills" *ngIf="getMatchedSkills(app).length === 0">
+            No matched skills found
+          </span>
+        </div>
+
+        <div class="skills-column">
+          <div class="skills-title missing-title">
+            <span>−</span>
+            Skills to Improve
+          </div>
+
+          <div class="skill-list" *ngIf="getMissingSkills(app).length > 0">
+            <span
+              class="skill-chip missing"
+              *ngFor="let skill of getMissingSkills(app)"
+            >
+              {{ skill }}
+            </span>
+          </div>
+
+          <span class="no-skills" *ngIf="getMissingSkills(app).length === 0">
+            No missing skills identified
+          </span>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="application-footer">
+        <div class="resume-information">
+          <div class="resume-icon">PDF</div>
+
+          <div>
+            <strong>{{ getResumeName(app) }}</strong>
+            <span>Submitted {{ getApplicationDate(app) }}</span>
+          </div>
+        </div>
+
+        <div class="application-actions">
+          <a
+            *ngIf="app.resume_filename"
+            href="#"
+            class="resume-button"
+            (click)="openResume($event, app)"
+          >
+            <span>↗</span>
+            View Resume
+          </a>
+
+          <button
+            type="button"
+            class="details-button"
+            (click)="openDetails(app)"
+          >
+            View Details
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- =========================================================
+       DETAIL DRAWER
+  ========================================================== -->
+  <div
+    class="drawer-overlay"
+    *ngIf="selectedApplication"
+    (click)="closeDetails()"
+  ></div>
+
+  <aside class="details-drawer" *ngIf="selectedApplication">
+    <div class="drawer-header">
+      <div>
+        <span class="section-label">APPLICATION DETAILS</span>
+        <h2>Application #{{ selectedApplication.id }}</h2>
+      </div>
+
+      <button
+        type="button"
+        class="drawer-close"
+        (click)="closeDetails()"
+        aria-label="Close details"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Job -->
+      <div class="drawer-job">
+        <div class="drawer-job-icon">
+          {{ getJobTitle(selectedApplication).charAt(0).toUpperCase() }}
+        </div>
+
+        <div>
+          <span>POSITION</span>
+          <h3>
+            {{ getJobTitle(selectedApplication) }}
+          </h3>
+          <small> Job #{{ selectedApplication.job_id }} </small>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="drawer-status">
+        <span>Current Status</span>
+
+        <span
+          class="status-badge"
+          [ngClass]="getStatusClass(selectedApplication)"
+        >
+          <span class="status-dot"></span>
+          {{ getStatusLabel(selectedApplication) }}
+        </span>
+      </div>
+
+      <!-- ATS -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">
+          <span>✦</span>
+          ATS Analysis
+        </div>
+
+        <div class="drawer-score">
+          <div
+            class="large-score-ring"
+            [ngClass]="getScoreClass(getScore(selectedApplication))"
+            [style.--score]="getScore(selectedApplication)"
+          >
+            <div class="large-score-inner">
+              <strong> {{ getScore(selectedApplication) }}% </strong>
+              <span>ATS MATCH</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-metrics">
+          <div>
+            <span>Skills</span>
+            <strong> {{ getSkillScore(selectedApplication) }}% </strong>
+          </div>
+
+          <div>
+            <span>Education</span>
+            <strong> {{ getEducationScore(selectedApplication) }}% </strong>
+          </div>
+
+          <div>
+            <span>Experience</span>
+            <strong> {{ getExperienceScore(selectedApplication) }}% </strong>
+          </div>
+        </div>
+
+        <div
+          class="drawer-recommendation"
+          [ngClass]="getRecommendationClass(selectedApplication)"
+        >
+          <span>AI Recommendation</span>
+          <strong>
+            {{ getRecommendation(selectedApplication) }}
+          </strong>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">
+          <span>◎</span>
+          Skills Analysis
+        </div>
+
+        <div class="drawer-skill-group">
+          <span class="drawer-skill-title matched-title"> Matched </span>
+
+          <div
+            class="skill-list"
+            *ngIf="getMatchedSkills(selectedApplication).length > 0"
+          >
+            <span
+              class="skill-chip matched"
+              *ngFor="let skill of getMatchedSkills(selectedApplication)"
+            >
+              {{ skill }}
+            </span>
+          </div>
+
+          <span
+            class="no-skills"
+            *ngIf="getMatchedSkills(selectedApplication).length === 0"
+          >
+            No matched skills.
+          </span>
+        </div>
+
+        <div class="drawer-skill-group">
+          <span class="drawer-skill-title missing-title">
+            Recommended to Improve
+          </span>
+
+          <div
+            class="skill-list"
+            *ngIf="getMissingSkills(selectedApplication).length > 0"
+          >
+            <span
+              class="skill-chip missing"
+              *ngFor="let skill of getMissingSkills(selectedApplication)"
+            >
+              {{ skill }}
+            </span>
+          </div>
+
+          <span
+            class="no-skills"
+            *ngIf="getMissingSkills(selectedApplication).length === 0"
+          >
+            No missing skills.
+          </span>
+        </div>
+      </div>
+
+      <!-- Resume -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">
+          <span>▤</span>
+          Resume
+        </div>
+
+        <div class="drawer-resume">
+          <div class="resume-icon">PDF</div>
+
+          <div class="resume-name">
+            <strong>
+              {{ getResumeName(selectedApplication) }}
+            </strong>
+
+            <span>
+              Submitted
+              {{ getApplicationDate(selectedApplication) }}
+            </span>
+          </div>
+
+          <a
+            *ngIf="selectedApplication.resume_filename"
+            href="#"
+            (click)="openResume($event, selectedApplication)"
+          >
+            Open
+          </a>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="drawer-section" *ngIf="selectedApplication.ats_notes">
+        <div class="drawer-section-title">
+          <span>✎</span>
+          ATS Notes
+        </div>
+
+        <div class="notes-box">
+          {{ selectedApplication.ats_notes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button
+        type="button"
+        class="drawer-close-button"
+        (click)="closeDetails()"
+      >
+        Close Details
+      </button>
+    </div>
+  </aside>
+</div>

@@ -1,0 +1,124 @@
+<main class="assessment-page">
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">PLACEMENT & ATS</span>
+      <h1>Assessment results</h1>
+      <p>Review student submissions, answers and evaluation status.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadResults()"
+      [disabled]="loadingResults || !selectedJobId"
+    >
+      ↻ Refresh
+    </button>
+  </header>
+
+  <section class="summary-grid">
+    <article class="summary-card">
+      <span>Total submissions</span>
+      <strong>{{ results.length }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Pending review</span>
+      <strong>{{ pendingCount }}</strong>
+    </article>
+
+    <article class="summary-card">
+      <span>Evaluated</span>
+      <strong>{{ evaluatedCount }}</strong>
+    </article>
+  </section>
+
+  <section class="filter-panel">
+    <label for="assessmentJob">Select job</label>
+
+    <select
+      id="assessmentJob"
+      [(ngModel)]="selectedJobId"
+      (change)="loadResults()"
+      [disabled]="loadingJobs || jobs.length === 0"
+    >
+      <option value="" disabled>Select a job</option>
+      <option *ngFor="let job of jobs" [value]="job.id">
+        {{ job.title }} · #{{ job.id }}
+      </option>
+    </select>
+  </section>
+
+  <section *ngIf="loadingJobs || loadingResults" class="message-panel">
+    Loading assessment results…
+  </section>
+
+  <section
+    *ngIf="!loadingJobs && !loadingResults && error"
+    class="message-panel error"
+  >
+    <strong>Unable to display results</strong>
+    <p>{{ error }}</p>
+    <button type="button" (click)="loadResults()">Try again</button>
+  </section>
+
+  <section
+    *ngIf="!loadingJobs && !loadingResults && !error && results.length === 0"
+    class="message-panel"
+  >
+    <h2>No submissions found</h2>
+    <p>No assessment submissions were returned for this job.</p>
+  </section>
+
+  <section
+    *ngIf="!loadingJobs && !loadingResults && !error && results.length > 0"
+    class="results-list"
+  >
+    <article
+      class="result-card"
+      *ngFor="let result of results; trackBy: trackByResult"
+    >
+      <header class="result-header">
+        <div>
+          <h2>{{ getStudentName(result) }}</h2>
+          <p>{{ result.student_email || "Email not provided" }}</p>
+          <small>
+            Submitted:
+            {{ formatDate(result.submitted_at || result.created_at) }}
+          </small>
+        </div>
+
+        <span class="status-chip">
+          {{ getStatus(result) }}
+        </span>
+      </header>
+
+      <div class="score-row">
+        <span>Assessment score</span>
+        <strong>{{ getScore(result) }}</strong>
+      </div>
+
+      <p *ngIf="result.feedback" class="feedback">
+        <strong>Reviewer feedback:</strong> {{ result.feedback }}
+      </p>
+
+      <details class="answers">
+        <summary>View submitted answers</summary>
+
+        <ng-container *ngIf="getAnswers(result).length; else noAnswers">
+          <div
+            class="answer-item"
+            *ngFor="let answer of getAnswers(result); let i = index"
+          >
+            <h3>{{ answer.question || "Question " + (i + 1) }}</h3>
+            <p>{{ answer.answer || "No answer provided." }}</p>
+          </div>
+        </ng-container>
+
+        <ng-template #noAnswers>
+          <p>Answer details were not included in the API response.</p>
+        </ng-template>
+      </details>
+    </article>
+  </section>
+</main>
